@@ -7,6 +7,18 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · Icons — Add icon asset library
+
+**What changed:** Added all 113 Dremio icon assets to `public/icons/`:
+- `public/icons/ai-agent/` — 101 SVGs exported from the AI Agent prototype's `.tsx` icon components (24×24px, `fill="currentColor"`)
+- `public/icons/org-settings/` — 12 SVGs pulled from the `dremio-design-system` repo's org-settings icon set
+
+**Why:** Engineers had no standalone icon asset reference. SVG exports allow icons to be used in design tools, documentation, and non-React contexts. Establishing a canonical icon folder also enforces the priority rule: prototype icons → org-settings icons → Fluent UI fallback.
+
+**CLAUDE.md updated:** Added "Icon Priority Rule" section documenting the mandatory resolution order.
+
+---
+
 ## 2026-03-13 · Design Systems · Repository — Initial release
 
 **What changed:** Created the Dremio AI Agent Design System repository with full component documentation, CLAUDE.md rules file, README for engineers and PMs, and guidelines for all 13 component areas.

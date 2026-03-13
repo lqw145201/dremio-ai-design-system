@@ -162,11 +162,23 @@ Use `<Button>` from `src/app/components/ui/button.tsx` — never hand-build `<bu
 | Inline with button text | **16×16px** |
 | Badge icons (ApprovalBadge warning) | **12×12px** |
 
+### Icon Priority Rule (MANDATORY)
+
+Always resolve icons in this order — stop at the first match:
+
+1. **`src/app/components/icons/`** — 101 Dremio AI Agent icons as React `.tsx` components. Check here first, always.
+2. **`public/icons/org-settings/`** — 12 org-settings SVG assets (icon-ai, icon-auditing, icon-bi, etc.)
+3. **`@fluentui/react-icons` Regular weight** — fallback only when no match exists in steps 1 or 2.
+
+**Never install a new icon package.** If a Fluent icon is used, import only the specific named export — do not add icon libraries.
+
+### Other Icon Rules
+
 - Icon name comes from Figma's `data-name` attribute in `get_design_context` output
 - Color via Tailwind `text-*` classes — icons use `fill="currentColor"`
 - Never use `preserveAspectRatio="none"` — causes distortion
 - `<img>` icons: always `objectFit: "contain"`
-- Fallback order: `src/app/components/icons/` → `@fluentui/react-icons` Regular → never hand-draw paths
+- Never hand-draw SVG paths from scratch
 
 ---
 
