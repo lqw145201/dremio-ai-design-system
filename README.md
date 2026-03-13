@@ -1,5 +1,7 @@
 # Dremio AI Agent – Design System
 
+> 👉 **[Open design-system.html](design-system.html) in your browser first** — visual color swatches, component demos, and specs.
+
 > Component specifications, design tokens, and usage guidelines for the Dremio AI Agent product surface.
 
 ---
@@ -20,6 +22,7 @@ The companion prototype lives at `dremio-prototype/` — this repo documents the
 
 ```
 dremio-ai-design-system/
+├── design-system.html           ← 👈 Open this first (browser, no install needed)
 ├── CLAUDE.md                    ← Claude Code rules (read automatically)
 ├── CHANGELOG.md                 ← All changes, newest first
 ├── README.md                    ← This file

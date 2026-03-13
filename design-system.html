@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dremio AI Agent — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --foreground: #202124;
+    --secondary-fg: #505862;
+    --muted-fg: #B0B7BF;
+    --muted: #EEEFF1;
+    --background: #F6F7F8;
+    --card: #FFFFFF;
+    --border: #D2D6DA;
+    --primary: #43B8C9;
+    --sidebar-primary: #2E92A1;
+    --accent: #008489;
+    --destructive: #CA3F32;
+    --destructive-hover: #AD3021;
+    --bg-hover: #F1FAFB;
+    --sidebar: #2A394A;
+    --info: #277ABD;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--background);
+    line-height: 1.6;
+  }
+
+  /* ─── Layout ─────────────────────────────────────────────── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 48px 80px;
+    background: var(--card);
+    min-height: 100vh;
+  }
+
+  /* ─── Cover ──────────────────────────────────────────────── */
+  .cover {
+    padding: 64px 0 56px;
+    border-bottom: 2px solid var(--muted);
+    margin-bottom: 48px;
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .cover-sub {
+    font-size: 16px;
+    color: var(--secondary-fg);
+    margin-bottom: 24px;
+  }
+  .cover-meta {
+    font-size: 12px;
+    color: var(--muted-fg);
+  }
+
+  /* ─── Table of Contents ──────────────────────────────────── */
+  .toc {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 56px;
+  }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-fg);
+    margin-bottom: 16px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 32px;
+  }
+  .toc a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 2px 0;
+    display: block;
+  }
+  .toc a:hover { text-decoration: underline; }
+  .toc-num {
+    color: var(--muted-fg);
+    font-size: 12px;
+    margin-right: 6px;
+  }
+
+  /* ─── Section headings ───────────────────────────────────── */
+  .section {
+    margin-bottom: 56px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--foreground);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  h2 .sec-num {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted-fg);
+    flex-shrink: 0;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--secondary-fg);
+    margin: 24px 0 10px;
+  }
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    color: var(--muted-fg);
+  }
+  p { margin-bottom: 10px; color: var(--foreground); font-size: 14px; }
+
+  /* ─── Data tables ────────────────────────────────────────── */
+  .dt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .dt th {
+    background: var(--background);
+    color: var(--secondary-fg);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .dt td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--muted);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .dt tr:last-child td { border-bottom: none; }
+  .dt tr:hover td { background: var(--background); }
+  .dt code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--muted);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #2E3A45;
+  }
+
+  /* ─── Color swatches ─────────────────────────────────────── */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .swatch-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .swatch-color {
+    height: 52px;
+    width: 100%;
+  }
+  .swatch-info {
+    padding: 8px 10px;
+    background: var(--card);
+  }
+  .swatch-token {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--secondary-fg);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .swatch-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted-fg);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .swatch-desc {
+    font-size: 11px;
+    color: var(--muted-fg);
+    line-height: 1.4;
+  }
+
+  /* ─── Code blocks ────────────────────────────────────────── */
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #F2F3F4;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 8px 0 16px;
+    overflow-x: auto;
+    line-height: 1.6;
+    color: #2E3A45;
+    white-space: pre;
+  }
+  code.inline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--muted);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #2E3A45;
+  }
+
+  /* ─── Note / callout ─────────────────────────────────────── */
+  .note {
+    background: #EFF6FF;
+    border-left: 3px solid var(--info);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #1e4d7b;
+    margin: 12px 0 16px;
+  }
+  .warn {
+    background: #FFF8F0;
+    border-left: 3px solid #E07B30;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #7a4010;
+    margin: 12px 0 16px;
+  }
+  .rule {
+    background: #FFF2F1;
+    border-left: 3px solid var(--destructive);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #6b1e18;
+    margin: 12px 0 16px;
+  }
+
+  /* ─── Bullet list ────────────────────────────────────────── */
+  ul.ds-list {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  ul.ds-list li {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+
+  /* ─── Badge demos ────────────────────────────────────────── */
+  .demo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 16px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .badge-block {
+    background: var(--card);
+    color: var(--secondary-fg);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .badge-dataset {
+    background: var(--card);
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .badge-time {
+    background: rgba(90,189,74,0.10);
+    color: #5ABD4A;
+  }
+  .badge-approval {
+    background: rgba(202,63,50,0.10);
+    color: var(--destructive);
+    gap: 4px;
+  }
+
+  /* ─── Button demos ───────────────────────────────────────── */
+  .btn-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+  }
+  .btn-primary   { background: var(--primary); color: white; }
+  .btn-secondary { background: var(--card); color: var(--secondary-fg); border: 1px solid var(--border); }
+  .btn-ghost     { background: transparent; color: var(--accent); }
+  .btn-destructive { background: var(--destructive); color: white; }
+  .btn-disabled  { opacity: 0.5; cursor: not-allowed; }
+
+  /* ─── Left nav demo ──────────────────────────────────────── */
+  .nav-demo {
+    display: inline-flex;
+    flex-direction: column;
+    width: 64px;
+    background: var(--sidebar);
+    border-radius: 8px;
+    padding: 12px 0;
+    gap: 4px;
+    align-items: center;
+  }
+  .nav-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.55);
+    font-size: 18px;
+  }
+  .nav-item.active {
+    background: rgba(255,255,255,0.12);
+    color: white;
+  }
+
+  /* ─── Spacing reference ──────────────────────────────────── */
+  .spacing-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .spacing-bar {
+    background: var(--primary);
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .spacing-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--secondary-fg);
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .spacing-desc {
+    font-size: 12px;
+    color: var(--muted-fg);
+  }
+
+  /* ─── Typography demo ────────────────────────────────────── */
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--muted);
+  }
+  .type-row:last-child { border-bottom: none; }
+  .type-sample { flex: 1; }
+  .type-meta {
+    font-size: 11px;
+    color: var(--muted-fg);
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ─── Shadow demo ────────────────────────────────────────── */
+  .shadow-demo {
+    display: inline-block;
+    background: var(--card);
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-size: 13px;
+    color: var(--secondary-fg);
+    margin: 8px 8px 8px 0;
+  }
+
+  /* ─── Critical rules list ────────────────────────────────── */
+  ol.rules {
+    padding-left: 20px;
+    counter-reset: rule;
+    list-style: none;
+  }
+  ol.rules li {
+    counter-increment: rule;
+    font-size: 13px;
+    color: var(--foreground);
+    margin-bottom: 8px;
+    padding: 8px 12px 8px 36px;
+    position: relative;
+    background: var(--background);
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+  ol.rules li::before {
+    content: counter(rule);
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-fg);
+    font-family: 'JetBrains Mono', monospace;
+    width: 16px;
+    text-align: right;
+  }
+
+  /* ─── Print ──────────────────────────────────────────────── */
+  @media print {
+    body { background: white; }
+    .page { padding: 24px 32px; }
+    h2 { page-break-before: always; }
+    h2:first-of-type { page-break-before: avoid; }
+    pre { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ COVER ════════════════════════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-eyebrow">Dremio · Internal Design Documentation</div>
+    <h1>AI Agent Design System</h1>
+    <div class="cover-sub">Component reference for the AI Agent prototype — colors, typography, spacing, badges, buttons, navigation, and all panel components.</div>
+    <div class="cover-meta">Last updated: March 2026 &nbsp;·&nbsp; Stack: React + Vite + TypeScript + Tailwind CSS v4</div>
+  </div>
+
+  <!-- ═══ TABLE OF CONTENTS ═════════════════════════════════════════════════ -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <div class="toc-grid">
+      <div><a href="#s1"><span class="toc-num">01</span>Overview &amp; Project Structure</a></div>
+      <div><a href="#s8"><span class="toc-num">08</span>Chat Panel</a></div>
+      <div><a href="#s2"><span class="toc-num">02</span>Design Tokens — Colors</a></div>
+      <div><a href="#s9"><span class="toc-num">09</span>Chat Input</a></div>
+      <div><a href="#s3"><span class="toc-num">03</span>Design Tokens — Typography</a></div>
+      <div><a href="#s10"><span class="toc-num">10</span>Workspace Panel</a></div>
+      <div><a href="#s4"><span class="toc-num">04</span>Design Tokens — Spacing &amp; Shadows</a></div>
+      <div><a href="#s11"><span class="toc-num">11</span>Catalog Panel</a></div>
+      <div><a href="#s5"><span class="toc-num">05</span>Badges &amp; Tags</a></div>
+      <div><a href="#s12"><span class="toc-num">12</span>Collapsed Panel Strip</a></div>
+      <div><a href="#s6"><span class="toc-num">06</span>Buttons</a></div>
+      <div><a href="#s13"><span class="toc-num">13</span>Panel Layout &amp; Interactions</a></div>
+      <div><a href="#s7a"><span class="toc-num">07a</span>Left Navigation</a></div>
+      <div><a href="#s14"><span class="toc-num">14</span>Critical Rules</a></div>
+      <div><a href="#s7b"><span class="toc-num">07b</span>Top Navigation</a></div>
+      <div><a href="#s15"><span class="toc-num">15</span>Chat List Panel</a></div>
+    </div>
+  </div>
+
+  <!-- ═══ §1 OVERVIEW ══════════════════════════════════════════════════════ -->
+  <div class="section" id="s1">
+    <h2><span class="sec-num">01</span>Overview &amp; Project Structure</h2>
+    <p>The AI Agent prototype is a single-page React application that renders a resizable 4-panel layout. All styling uses CSS custom properties defined in <code class="inline">src/styles/theme.css</code> and mapped to Tailwind via <code class="inline">@theme inline</code>.</p>
+
+    <h3>File Locations</h3>
+    <table class="dt">
+      <thead><tr><th>Path</th><th>Contents</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/app/pages/AIAgentPage.tsx</code></td><td>Root page — mounts the full 4-panel layout</td></tr>
+        <tr><td><code>src/app/components/</code></td><td>LeftNav, TopNav, ChatListPanel, ChatPanel, WorkspacePanel, CatalogPanel, ChatInput, CollapsedPanelStrip</td></tr>
+        <tr><td><code>src/app/components/ui/</code></td><td>Shared primitives: Button, Table, Badge</td></tr>
+        <tr><td><code>src/app/components/icons/</code></td><td>106 Dremio SVG icons — check here before installing any icon package</td></tr>
+        <tr><td><code>src/app/hooks/</code></td><td>usePanelLayout, useWorkspace, useChat</td></tr>
+        <tr><td><code>src/styles/theme.css</code></td><td>All CSS custom property tokens</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4-Panel Layout</h3>
+    <pre>AIAgentPage
+  ├── LeftNav           (64px, fixed)
+  └── flex-1
+        ├── TopNav      (48px, fixed)
+        └── ResizablePanelGroup (react-resizable-panels)
+              ├── ChatListPanel     (collapsible, ~260px default)
+              ├── ChatPanel         (flex-1, main content)
+              ├── WorkspacePanel    (collapsible, ~320px)
+              └── CatalogPanel      (collapsible, ~280px)</pre>
+    <div class="note">react-resizable-panels is used for the AI Agent layout only. Settings pages use fixed-width panels without the resizable library.</div>
+  </div>
+
+  <!-- ═══ §2 COLORS ════════════════════════════════════════════════════════ -->
+  <div class="section" id="s2">
+    <h2><span class="sec-num">02</span>Design Tokens — Colors</h2>
+    <p>All colors are defined in <code class="inline">src/styles/theme.css</code>. <strong>Never hardcode a hex value</strong> — always reference the CSS token via Tailwind or inline style.</p>
+
+    <h3>Core Palette</h3>
+    <div class="swatch-grid">
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#202124"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--foreground</span>
+          <span class="swatch-hex">#202124</span>
+          <span class="swatch-desc">Primary text, titles</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#505862"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--secondary-foreground</span>
+          <span class="swatch-hex">#505862</span>
+          <span class="swatch-desc">Secondary text, table headers, labels</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#B0B7BF"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--muted-foreground</span>
+          <span class="swatch-hex">#B0B7BF</span>
+          <span class="swatch-desc">Placeholders &amp; disabled ONLY</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#EEEFF1; border-bottom:1px solid #D2D6DA;"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--muted</span>
+          <span class="swatch-hex">#EEEFF1</span>
+          <span class="swatch-desc">Dividers, muted backgrounds</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#F6F7F8; border-bottom:1px solid #D2D6DA;"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--background</span>
+          <span class="swatch-hex">#F6F7F8</span>
+          <span class="swatch-desc">Page body background</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid #D2D6DA;"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--card</span>
+          <span class="swatch-hex">#FFFFFF</span>
+          <span class="swatch-desc">Cards, panels</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#D2D6DA"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--border</span>
+          <span class="swatch-hex">#D2D6DA</span>
+          <span class="swatch-desc">Input &amp; card borders</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#43B8C9"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--primary</span>
+          <span class="swatch-hex">#43B8C9</span>
+          <span class="swatch-desc">Primary buttons, active states</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#2E92A1"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--sidebar-primary</span>
+          <span class="swatch-hex">#2E92A1</span>
+          <span class="swatch-desc">Primary button hover</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#008489"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--accent</span>
+          <span class="swatch-hex">#008489</span>
+          <span class="swatch-desc">Links, ghost button text</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#CA3F32"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--destructive</span>
+          <span class="swatch-hex">#CA3F32</span>
+          <span class="swatch-desc">Delete, error states</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#AD3021"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--destructive-hover</span>
+          <span class="swatch-hex">#AD3021</span>
+          <span class="swatch-desc">Destructive button hover</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#F1FAFB; border-bottom:1px solid #D2D6DA;"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--background-hover</span>
+          <span class="swatch-hex">#F1FAFB</span>
+          <span class="swatch-desc">Ghost button hover bg, nav hover</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#2A394A"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--sidebar</span>
+          <span class="swatch-hex">#2A394A</span>
+          <span class="swatch-desc">Left nav background</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#277ABD"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--chart-5 / info</span>
+          <span class="swatch-hex">#277ABD</span>
+          <span class="swatch-desc">Info callouts, TimeBadge</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule"><strong>Critical:</strong> <code class="inline">--muted-foreground</code> is for placeholders and disabled states ONLY. Table headers, stat labels, and section descriptions must use <code class="inline">--secondary-foreground</code> (#505862).</div>
+
+    <div class="warn" style="margin-top:12px;">
+      <strong>⚠ Prototype inconsistency — primary vs accent as button background.</strong><br>
+      The formal <code class="inline">&lt;Button variant="default"&gt;</code> component correctly uses <code class="inline">--primary</code> (#43B8C9) as its background. However, several action buttons in the prototype (<em>Execute</em>, <em>Run in SQL runner</em>, <em>Run in SQL</em> in WorkspacePanel) were built as ad-hoc <code class="inline">&lt;button&gt;</code> elements with <code class="inline">bg-accent</code> (#008489) — a darker teal — applied directly.<br><br>
+      <strong>Rule:</strong> <code class="inline">--accent</code> is for <em>ghost button text and links only</em> — never as a button background fill. Any hand-built action button using <code class="inline">bg-accent</code> should be refactored to use <code class="inline">&lt;Button variant="default"&gt;</code> (which renders with <code class="inline">--primary</code>).
+    </div>
+
+    <h3>Tailwind Usage</h3>
+    <table class="dt">
+      <thead><tr><th>Tailwind class</th><th>CSS token</th><th>Common use</th></tr></thead>
+      <tbody>
+        <tr><td><code>text-foreground</code></td><td><code>--foreground</code></td><td>Body text, page titles</td></tr>
+        <tr><td><code>text-secondary-foreground</code></td><td><code>--secondary-foreground</code></td><td>Labels, table headers</td></tr>
+        <tr><td><code>text-muted-foreground</code></td><td><code>--muted-foreground</code></td><td>Placeholders, disabled</td></tr>
+        <tr><td><code>text-primary</code></td><td><code>--primary</code></td><td>Active icon tint</td></tr>
+        <tr><td><code>text-accent</code></td><td><code>--accent</code></td><td>Ghost button text, links</td></tr>
+        <tr><td><code>text-destructive</code></td><td><code>--destructive</code></td><td>Delete actions on hover</td></tr>
+        <tr><td><code>bg-background</code></td><td><code>--background</code></td><td>Page body</td></tr>
+        <tr><td><code>bg-card</code></td><td><code>--card</code></td><td>Panel backgrounds</td></tr>
+        <tr><td><code>bg-muted</code></td><td><code>--muted</code></td><td>Selected chat rows, dividers</td></tr>
+        <tr><td><code>bg-primary</code></td><td><code>--primary</code></td><td>Primary button bg</td></tr>
+        <tr><td><code>border-border</code></td><td><code>--border</code></td><td>Card and input borders</td></tr>
+        <tr><td><code>border-muted</code></td><td><code>--muted</code></td><td>Section dividers, sidebar border</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §3 TYPOGRAPHY ════════════════════════════════════════════════════ -->
+  <div class="section" id="s3">
+    <h2><span class="sec-num">03</span>Design Tokens — Typography</h2>
+    <p>Font: <strong>Inter</strong> (UI). Monospace: <strong>Fira Code / JetBrains Mono</strong> (SQL editor, code blocks).</p>
+
+    <div style="border:1px solid var(--border); border-radius:8px; padding:20px 24px; margin-bottom:20px; background:var(--card);">
+      <div class="type-row">
+        <div class="type-sample" style="font-size:24px; font-weight:700; color:#202124; font-family:'Inter',sans-serif;">Page Title</div>
+        <div class="type-meta">text-2xl · 24px · weight 700</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:18px; font-weight:600; color:#202124; font-family:'Inter',sans-serif;">Section Title</div>
+        <div class="type-meta">text-xl · 18px · weight 600</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:16px; font-weight:600; color:#202124; font-family:'Inter',sans-serif;">Card / Nav Header</div>
+        <div class="type-meta">text-lg · 16px · weight 600</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:14px; font-weight:400; color:#202124; font-family:'Inter',sans-serif;">Body text, table cells, labels</div>
+        <div class="type-meta">text-base · 14px · weight 400</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:12px; font-weight:400; color:#505862; font-family:'Inter',sans-serif;">Badges, metadata, captions</div>
+        <div class="type-meta">text-sm · 12px · weight 400</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#505862; font-family:'Inter',sans-serif;">BADGE LABEL</div>
+        <div class="type-meta">9px · weight 600 · uppercase</div>
+      </div>
+    </div>
+
+    <table class="dt">
+      <thead><tr><th>Tailwind class</th><th>px</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td><code>text-2xl</code></td><td>24px</td><td>Page titles</td></tr>
+        <tr><td><code>text-xl</code></td><td>18px</td><td>Section titles</td></tr>
+        <tr><td><code>text-lg</code></td><td>16px</td><td>Card headers, nav section labels</td></tr>
+        <tr><td><code>text-base</code></td><td>14px</td><td>Body text, table cells, input labels</td></tr>
+        <tr><td><code>text-sm</code></td><td>12px</td><td>Badges, metadata, timestamps</td></tr>
+        <tr><td><code>font-semibold</code></td><td>600</td><td>Headings, active nav items, badge text</td></tr>
+        <tr><td><code>font-normal</code></td><td>400</td><td>Body text</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §4 SPACING & SHADOWS ═════════════════════════════════════════════ -->
+  <div class="section" id="s4">
+    <h2><span class="sec-num">04</span>Design Tokens — Spacing &amp; Shadows</h2>
+
+    <h3>Spacing Scale (common values)</h3>
+    <div style="padding:16px; background:var(--background); border:1px solid var(--border); border-radius:8px; margin-bottom:16px;">
+      <div class="spacing-row"><span class="spacing-label">4px</span><div class="spacing-bar" style="width:4px"></div><span class="spacing-desc">Icon gaps, tight inline spacing</span></div>
+      <div class="spacing-row"><span class="spacing-label">6px</span><div class="spacing-bar" style="width:6px"></div><span class="spacing-desc">Badge padding (px-[6px]), nav item gap</span></div>
+      <div class="spacing-row"><span class="spacing-label">8px</span><div class="spacing-bar" style="width:8px"></div><span class="spacing-desc">Button horizontal padding, nav item padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">12px</span><div class="spacing-bar" style="width:12px"></div><span class="spacing-desc">Workspace output item padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">14px</span><div class="spacing-bar" style="width:14px"></div><span class="spacing-desc">Table cell vertical padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">16px</span><div class="spacing-bar" style="width:16px"></div><span class="spacing-desc">Panel padding, section nav list padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">20px</span><div class="spacing-bar" style="width:20px"></div><span class="spacing-desc">Table cell horizontal padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">24px</span><div class="spacing-bar" style="width:24px"></div><span class="spacing-desc">Page padding, sidebar header left padding</span></div>
+      <div class="spacing-row"><span class="spacing-label">48px</span><div class="spacing-bar" style="width:48px"></div><span class="spacing-desc">TopNav height</span></div>
+      <div class="spacing-row"><span class="spacing-label">64px</span><div class="spacing-bar" style="width:64px"></div><span class="spacing-desc">LeftNav width, PageHeader height</span></div>
+    </div>
+
+    <h3>Border Radius</h3>
+    <table class="dt">
+      <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td><code>rounded-[4px]</code></td><td>4px</td><td>Buttons, badges, nav items, chat rows, code blocks</td></tr>
+        <tr><td><code>rounded-[8px]</code></td><td>8px</td><td>Cards, panels, modals, general containers</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Shadows</h3>
+    <div style="padding:20px; background:var(--background); border:1px solid var(--border); border-radius:8px; margin-bottom:12px; display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start;">
+      <div>
+        <div class="shadow-demo" style="box-shadow: 0px 2px 4px rgba(16,18,20,0.1);">elevation-sm</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted-fg); margin-top:4px;">0px 2px 4px rgba(16,18,20,0.1)</div>
+        <div style="font-size:12px; color:var(--secondary-fg);">Cards, inline panels</div>
+      </div>
+      <div>
+        <div class="shadow-demo" style="box-shadow: 4px 4px 16px 0px rgba(16,18,20,0.1);">elevation-dropdown</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted-fg); margin-top:4px;">4px 4px 16px 0px rgba(16,18,20,0.1)</div>
+        <div style="font-size:12px; color:var(--secondary-fg);">Dropdowns, floating menus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ §5 BADGES ════════════════════════════════════════════════════════ -->
+  <div class="section" id="s5">
+    <h2><span class="sec-num">05</span>Badges &amp; Tags</h2>
+    <p>All badges are defined inline in <code class="inline">ChatPanel.tsx</code>. Common dimensions: <strong>height 20px</strong>, <strong>padding 0 6px</strong>, <strong>font-size 9px</strong>, <strong>font-weight 600</strong>, <strong>uppercase</strong>.</p>
+
+    <h3>BlockTypeBadge</h3>
+    <p>Appears on each chat message block to indicate its type.</p>
+    <div class="demo-row">
+      <span class="badge badge-block">SQL</span>
+      <span class="badge badge-block">TABLE</span>
+      <span class="badge badge-block">CHART</span>
+      <span class="badge badge-block">TEXT</span>
+      <span class="badge badge-block">TABLE</span>
+      <span class="badge badge-block">VIEW</span>
+    </div>
+    <table class="dt">
+      <thead><tr><th>Block type key</th><th>Displayed label</th><th>Background</th><th>Text color</th><th>Border</th></tr></thead>
+      <tbody>
+        <tr><td><code>sql</code></td><td>SQL</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code> (absolute overlay)</td></tr>
+        <tr><td><code>table</code></td><td>TABLE</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code></td></tr>
+        <tr><td><code>chart</code></td><td>CHART</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code></td></tr>
+        <tr><td><code>explanation</code></td><td>TEXT</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code></td></tr>
+        <tr><td><code>dataset</code></td><td>TABLE</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code></td></tr>
+        <tr><td><code>view</code></td><td>VIEW</td><td><code>--card</code></td><td><code>--secondary-foreground</code></td><td><code>border-border</code></td></tr>
+      </tbody>
+    </table>
+    <div class="note">All BlockTypeBadges share the same visual style — white bg, <code class="inline">--border</code> color border, <code class="inline">--secondary-foreground</code> text. There is no accent-colored variant. The border is implemented as an <code class="inline">absolute inset-0</code> overlay div (not a CSS border property) to preserve inner padding.</div>
+    <pre>// BlockTypeBadge — same style for ALL types
+bg-card h-[20px] px-[6px] py-px relative rounded-[var(--radius-button)]
+// border overlay (absolute div):
+absolute inset-0 rounded-[var(--radius-button)] border border-border
+// text (all types):
+text-[9px] font-semibold uppercase text-secondary-foreground</pre>
+
+    <h3>TimeBadge</h3>
+    <p>Shows query execution time (e.g. "0.8s"). Uses <code class="inline">--chart-5</code> which resolves to <strong>green</strong> (#5ABD4A).</p>
+    <div class="demo-row">
+      <span class="badge" style="background:rgba(90,189,74,0.10); color:#5ABD4A;">0.8s</span>
+      <span class="badge" style="background:rgba(90,189,74,0.10); color:#5ABD4A;">1.2s</span>
+    </div>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Background</td><td><code>bg-chart-5/10</code> → rgba(90,189,74,0.10) — light green tint</td></tr>
+        <tr><td>Text color</td><td><code>text-chart-5</code> → <code>--chart-5</code> = #5ABD4A (green)</td></tr>
+        <tr><td>Token value</td><td><code>--chart-5: rgba(90, 189, 74, 1)</code> in theme.css</td></tr>
+        <tr><td>No border</td><td>Unlike BlockTypeBadge, TimeBadge has no border overlay</td></tr>
+      </tbody>
+    </table>
+    <pre>bg-chart-5/10  px-[6px] py-px  rounded-[var(--radius-button)]
+text-chart-5  text-[9px]  font-semibold</pre>
+
+    <h3>ApprovalBadge</h3>
+    <p>Shown when a workflow step requires user approval.</p>
+    <div class="demo-row">
+      <span class="badge badge-approval">⚠ ACTION REQUIRED</span>
+    </div>
+    <pre>bg-destructive/10  h-[20px]  px-[6px]  gap-[4px]  rounded-[4px]
+// warning icon: 12×12px  text-destructive
+// label text: text-[9px] font-semibold text-destructive uppercase</pre>
+  </div>
+
+  <!-- ═══ §6 BUTTONS ═══════════════════════════════════════════════════════ -->
+  <div class="section" id="s6">
+    <h2><span class="sec-num">06</span>Buttons</h2>
+    <p>Always use <code class="inline">&lt;Button&gt;</code> from <code class="inline">src/app/components/ui/button.tsx</code>. Never hand-build <code class="inline">&lt;button&gt;</code> for primary/secondary/ghost/destructive actions.</p>
+
+    <div class="demo-row">
+      <button class="btn-demo btn-primary">Primary</button>
+      <button class="btn-demo btn-secondary">Secondary</button>
+      <button class="btn-demo btn-ghost">Ghost / Tertiary</button>
+      <button class="btn-demo btn-destructive">Destructive</button>
+      <button class="btn-demo btn-primary btn-disabled">Disabled</button>
+    </div>
+
+    <table class="dt">
+      <thead><tr><th>Variant</th><th>cva key</th><th>Default bg</th><th>Hover bg</th><th>Text</th><th>Border</th></tr></thead>
+      <tbody>
+        <tr><td>Primary</td><td><code>default</code></td><td><code>--primary</code> #43B8C9</td><td><code>--sidebar-primary</code> #2E92A1</td><td>white</td><td>none</td></tr>
+        <tr><td>Secondary</td><td><code>secondary</code></td><td><code>--card</code> #FFFFFF</td><td><code>--background</code> #F6F7F8</td><td><code>--secondary-fg</code></td><td><code>border-border</code></td></tr>
+        <tr><td>Ghost</td><td><code>ghost</code></td><td>transparent</td><td><code>--background-hover</code> #F1FAFB</td><td><code>--accent</code> #008489</td><td>none</td></tr>
+        <tr><td>Destructive</td><td><code>destructive</code></td><td><code>--destructive</code> #CA3F32</td><td><code>--destructive-hover</code> #AD3021</td><td>white</td><td>none</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Dimensions (Figma spec)</h3>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Height</td><td>32px (<code>h-[32px]</code>) — only one size in Dremio DS</td></tr>
+        <tr><td>Horizontal padding</td><td>8px (<code>px-2</code>)</td></tr>
+        <tr><td>Icon gap</td><td>4px (<code>gap-1</code>)</td></tr>
+        <tr><td>Border radius</td><td>4px (<code>rounded-[4px]</code>)</td></tr>
+        <tr><td>Disabled</td><td><code>opacity-50</code>, pointer-events none</td></tr>
+      </tbody>
+    </table>
+    <div class="rule"><strong>Max 1 Primary button per page.</strong> cva hover colors cannot be overridden via className — edit the variant in button.tsx directly.</div>
+  </div>
+
+  <!-- ═══ §7a LEFT NAV ══════════════════════════════════════════════════════ -->
+  <div class="section" id="s7a">
+    <h2><span class="sec-num">07a</span>Left Navigation</h2>
+    <p>Fixed 64px-wide vertical strip on the far left. Dark background (<code class="inline">--sidebar</code>). Icon-only navigation.</p>
+
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Container</td><td>width 64px, height 100vh, bg <code>--sidebar</code> (#2A394A), flex column</td></tr>
+        <tr><td>Logo area</td><td>64×64px, centered</td></tr>
+        <tr><td>Nav items</td><td>40×40px each, <code>rounded-[8px]</code>, centered in 64px strip</td></tr>
+        <tr><td>Icon size</td><td>24×24px</td></tr>
+        <tr><td>Default icon color</td><td><code>rgba(255,255,255,0.55)</code> — 55% white</td></tr>
+        <tr><td>Hover bg</td><td><code>rgba(255,255,255,0.08)</code></td></tr>
+        <tr><td>Active bg</td><td><code>rgba(255,255,255,0.12)</code></td></tr>
+        <tr><td>Active icon color</td><td><code>#FFFFFF</code> (full white)</td></tr>
+        <tr><td>Active indicator</td><td>2px left border, color <code>--primary</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §7b TOP NAV ═══════════════════════════════════════════════════════ -->
+  <div class="section" id="s7b">
+    <h2><span class="sec-num">07b</span>Top Navigation</h2>
+    <p>Source: <code class="inline">src/app/components/TopNav.tsx</code>. Figma node <code class="inline">12337:132404</code>.</p>
+
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Container height</td><td>48px, bg <code>--card</code>, border-bottom 1px <code>--border</code></td></tr>
+        <tr><td>Left section</td><td>Project context dropdown — 160px min-width</td></tr>
+        <tr><td>Center section</td><td>Search bar — flex-1, max-width 480px</td></tr>
+        <tr><td>Right section</td><td>AI Agent button only</td></tr>
+        <tr><td>Search input bg</td><td><code>--background</code>, border <code>--border</code>, radius 4px, height 32px</td></tr>
+        <tr><td>Search icon</td><td>16×16px, color <code>--muted-foreground</code></td></tr>
+        <tr><td>AI Agent button</td><td>Primary variant, 32px height</td></tr>
+      </tbody>
+    </table>
+    <div class="warn"><strong>Component contract:</strong> Top Nav contains only: project context dropdown + search bar + AI Agent button. Run/Preview/Engine controls belong in the SQL Runner Action Header, not here.</div>
+  </div>
+
+  <!-- ═══ §15 CHAT LIST PANEL ═══════════════════════════════════════════════ -->
+  <div class="section" id="s15">
+    <h2><span class="sec-num">07c</span>Chat List Panel</h2>
+    <p>Source: <code class="inline">src/app/components/ChatListPanel.tsx</code>. Collapsible left panel listing all chat conversations.</p>
+
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Container</td><td>bg <code>--card</code>, border-right 1px <code>--border</code></td></tr>
+        <tr><td>Header</td><td>48px, "Chats" label text-lg font-semibold + New Chat button (ghost)</td></tr>
+        <tr><td>Chat item row</td><td>h-[40px] px-[8px] rounded-[4px] group relative</td></tr>
+        <tr><td>Normal bg</td><td>transparent</td></tr>
+        <tr><td>Hover bg</td><td><code>bg-muted/50</code></td></tr>
+        <tr><td>Selected bg</td><td><code>bg-muted</code> (#EEEFF1)</td></tr>
+        <tr><td>Title text</td><td>text-base, truncate, <code>--foreground</code></td></tr>
+        <tr><td>Timestamp</td><td>text-sm, <code>--muted-foreground</code></td></tr>
+        <tr><td>More (⋯) button</td><td>size-[24px], <code>opacity-0 group-hover:opacity-100</code> — hover-only</td></tr>
+      </tbody>
+    </table>
+
+    <pre>// Chat item row pattern
+&lt;div className="group relative h-[40px] px-[8px] rounded-[4px]
+  hover:bg-muted/50 {isSelected ? 'bg-muted' : ''}"&gt;
+  &lt;span className="truncate text-base"&gt;{title}&lt;/span&gt;
+  &lt;button className="opacity-0 group-hover:opacity-100 size-[24px]"&gt;
+    &lt;IconMore /&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+  </div>
+
+  <!-- ═══ §8 CHAT PANEL ════════════════════════════════════════════════════ -->
+  <div class="section" id="s8">
+    <h2><span class="sec-num">08</span>Chat Panel</h2>
+    <p>Source: <code class="inline">src/app/components/ChatPanel.tsx</code>. The main conversation view — renders message blocks with badges.</p>
+
+    <h3>Message Block Structure</h3>
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Block container</td><td><code>px-[24px] py-[16px]</code>, border-bottom 1px <code>--muted</code></td></tr>
+        <tr><td>Block header row</td><td>flex, align-items center, gap-[8px], mb-[8px]</td></tr>
+        <tr><td>BlockTypeBadge</td><td>See §5 Badges. Positioned in header row.</td></tr>
+        <tr><td>TimeBadge</td><td>See §5 Badges. Shown after BlockTypeBadge.</td></tr>
+        <tr><td>ApprovalBadge</td><td>See §5 Badges. Shown when approval needed.</td></tr>
+        <tr><td>Block content</td><td>Varies by type: SQL editor, table, chart, markdown text</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Tool Calls Block</h3>
+    <table class="dt">
+      <thead><tr><th>State</th><th>Style</th></tr></thead>
+      <tbody>
+        <tr><td>Collapsed (default)</td><td>Single row, tool icon + name + count badge, ghost bg</td></tr>
+        <tr><td>Expanded</td><td>List of individual tool call rows with name, status, duration</td></tr>
+        <tr><td>Running tool</td><td>Spinning <code>--primary</code> border circle (dasharray animation)</td></tr>
+        <tr><td>Complete</td><td>Filled <code>--primary</code> circle with checkmark</td></tr>
+        <tr><td>Error</td><td><code>--destructive</code> circle with × icon</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §9 CHAT INPUT ════════════════════════════════════════════════════ -->
+  <div class="section" id="s9">
+    <h2><span class="sec-num">09</span>Chat Input</h2>
+    <p>Source: <code class="inline">src/app/components/ChatInput.tsx</code>. Fixed-position input bar at the bottom of ChatPanel.</p>
+
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Container</td><td>bg <code>--card</code>, border-top 1px <code>--border</code>, <code>px-[16px] py-[12px]</code></td></tr>
+        <tr><td>Input wrapper</td><td>border 1px <code>--border</code>, radius 8px, bg <code>--card</code>, min-height 44px</td></tr>
+        <tr><td>Textarea</td><td>resize none, text-base, <code>--foreground</code>, placeholder <code>--muted-foreground</code></td></tr>
+        <tr><td>Send button</td><td>Primary variant, 32px, icon-only, right side of input</td></tr>
+        <tr><td>Stop button (streaming)</td><td>Destructive variant, replaces Send while AI is responding</td></tr>
+        <tr><td>Attach / context pills</td><td>Below textarea, ghost small buttons with × dismiss</td></tr>
+        <tr><td>Input focus ring</td><td>border-color <code>--primary</code>, no box-shadow</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §10 WORKSPACE PANEL ══════════════════════════════════════════════ -->
+  <div class="section" id="s10">
+    <h2><span class="sec-num">10</span>Workspace Panel</h2>
+    <p>Source: <code class="inline">src/app/components/WorkspacePanel.tsx</code>. Right-side panel showing the AI's execution plan and outputs.</p>
+
+    <h3>Plan Tab — Step States</h3>
+    <table class="dt">
+      <thead><tr><th>State</th><th>Icon</th><th>Style</th></tr></thead>
+      <tbody>
+        <tr><td>Done</td><td>Filled circle + checkmark</td><td>Circle fill <code>--chart-5</code> (#277ABD), icon white</td></tr>
+        <tr><td>Running</td><td>Spinning dashed circle</td><td>Stroke <code>--primary</code>, stroke-dasharray animation</td></tr>
+        <tr><td>Pending</td><td>Empty circle</td><td>Stroke <code>--border</code> only, no fill</td></tr>
+        <tr><td>Error</td><td>Circle + ×</td><td>Circle fill <code>--destructive</code>, icon white</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Output Tab — Item States</h3>
+    <table class="dt">
+      <thead><tr><th>State</th><th>Style</th></tr></thead>
+      <tbody>
+        <tr><td>Active output item</td><td><code>bg-primary/10</code>, left border 2px <code>--primary</code></td></tr>
+        <tr><td>Hover (inactive)</td><td><code>hover:bg-background-hover</code></td></tr>
+        <tr><td>Item padding</td><td><code>px-[12px] py-[6px]</code></td></tr>
+        <tr><td>Item label</td><td>text-base, <code>--foreground</code></td></tr>
+        <tr><td>Item type badge</td><td>Same as BlockTypeBadge (§5)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §11 CATALOG PANEL ════════════════════════════════════════════════ -->
+  <div class="section" id="s11">
+    <h2><span class="sec-num">11</span>Catalog Panel</h2>
+    <p>Source: <code class="inline">src/app/components/CatalogPanel.tsx</code>. Right-side panel displaying the data catalog tree for browsing datasets.</p>
+
+    <h3>Tree Item States</h3>
+    <table class="dt">
+      <thead><tr><th>Mode</th><th>State</th><th>Style</th></tr></thead>
+      <tbody>
+        <tr><td>Normal (browse)</td><td>Default</td><td>h-[32px], transparent bg</td></tr>
+        <tr><td>Normal (browse)</td><td>Active (current item)</td><td><code>bg-[#e9f5f9]</code> — light teal tint</td></tr>
+        <tr><td>Normal (browse)</td><td>Hover</td><td><code>hover:bg-muted/50</code></td></tr>
+        <tr><td>Pick mode (save)</td><td>Selected</td><td><code>bg-primary/10</code></td></tr>
+        <tr><td>Pick mode (save)</td><td>Hover</td><td><code>hover:bg-muted/50</code></td></tr>
+        <tr><td>Any</td><td>Indent level</td><td>12px per depth level (<code>pl-[{depth*12}px]</code>)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Tree Item Icon Sizes</h3>
+    <table class="dt">
+      <thead><tr><th>Icon type</th><th>Size</th><th>Color</th></tr></thead>
+      <tbody>
+        <tr><td>Source/schema expand chevron</td><td>16×16px</td><td><code>--muted-foreground</code></td></tr>
+        <tr><td>Node type icon (folder, table, etc.)</td><td>16×16px</td><td>Varies by type</td></tr>
+        <tr><td>Label text</td><td>text-base (14px)</td><td><code>--foreground</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §12 COLLAPSED PANEL STRIP ════════════════════════════════════════ -->
+  <div class="section" id="s12">
+    <h2><span class="sec-num">12</span>Collapsed Panel Strip</h2>
+    <p>Source: <code class="inline">src/app/components/CollapsedPanelStrip.tsx</code>. Shown when a side panel (Chat List, Workspace, or Catalog) is collapsed to a narrow strip.</p>
+
+    <table class="dt">
+      <thead><tr><th>Element</th><th>Spec</th></tr></thead>
+      <tbody>
+        <tr><td>Strip width</td><td>40px</td></tr>
+        <tr><td>Background</td><td><code>--card</code></td></tr>
+        <tr><td>Border</td><td>1px <code>--border</code> on the side facing the main panel</td></tr>
+        <tr><td>Icon buttons</td><td>32×32px, ghost variant, centered</td></tr>
+        <tr><td>Icon size</td><td>20×20px</td></tr>
+        <tr><td>Label (rotated)</td><td>text-sm, <code>--secondary-foreground</code>, rotate-90 or rotate-270</td></tr>
+        <tr><td>Expand button</td><td>At bottom of strip, ghost, ChevronLeft/Right 20px icon</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §13 PANEL INTERACTIONS ═══════════════════════════════════════════ -->
+  <div class="section" id="s13">
+    <h2><span class="sec-num">13</span>Panel Layout &amp; Interactions</h2>
+
+    <h3>Resize Behavior</h3>
+    <ul class="ds-list">
+      <li>All panels use <code class="inline">react-resizable-panels</code> — <code class="inline">PanelGroup</code> + <code class="inline">Panel</code> + <code class="inline">PanelResizeHandle</code></li>
+      <li>Resize handles are 4px wide, invisible by default, show a 1px <code class="inline">--border</code> line on hover</li>
+      <li>Panels have <code class="inline">minSize</code> prop to prevent collapse below usable size</li>
+      <li>State persisted in <code class="inline">usePanelLayout</code> hook (localStorage)</li>
+    </ul>
+
+    <h3>Collapse / Expand</h3>
+    <ul class="ds-list">
+      <li>Each side panel has a collapse button (chevron icon, 24px) in its header</li>
+      <li>Collapsed state: panel unmounts, <code class="inline">CollapsedPanelStrip</code> renders in its place</li>
+      <li>Re-expand: click strip or chevron to restore last saved width</li>
+    </ul>
+
+    <h3>Portal-Rendered Dropdowns</h3>
+    <ul class="ds-list">
+      <li>Dropdowns that overflow panel bounds use <code class="inline">ReactDOM.createPortal</code> into <code class="inline">document.body</code></li>
+      <li>Position calculated with <code class="inline">getBoundingClientRect()</code> on the trigger element</li>
+      <li>Close on: outside click, Escape key, scroll of the trigger's scroll container</li>
+    </ul>
+  </div>
+
+  <!-- ═══ §14 CRITICAL RULES ════════════════════════════════════════════════ -->
+  <div class="section" id="s14">
+    <h2><span class="sec-num">14</span>Critical Rules</h2>
+    <p>These are the most common mistakes. Read before making any change.</p>
+
+    <ol class="rules">
+      <li><strong>--muted-foreground for placeholders/disabled ONLY.</strong> Table headers, stat labels, section descriptions → <code class="inline">--secondary-foreground</code>.</li>
+      <li><strong>No card chrome on full-page layouts.</strong> Pages are <code class="inline">h-screen w-screen</code>. Never add border/radius/shadow/margin to the root page container.</li>
+      <li><strong>Max 1 Primary button per page.</strong> All other actions use Secondary or Ghost.</li>
+      <li><strong>Row actions are hover-only.</strong> Use <code class="inline">opacity-0 group-hover:opacity-100</code>. Never show them unconditionally.</li>
+      <li><strong>Delete icons are neutral by default.</strong> Apply <code class="inline">text-destructive</code> on hover only — never always-red.</li>
+      <li><strong>Secondary nav right border uses --muted, not --border.</strong> <code class="inline">border-right: 1px solid var(--muted)</code>.</li>
+      <li><strong>Icon sizes are not interchangeable.</strong> 24px (nav/header), 20px (table rows), 16px (button inline).</li>
+      <li><strong>cva variant hover cannot be overridden via className.</strong> Tailwind resolves by stylesheet order. Edit the variant in <code class="inline">button.tsx</code> directly.</li>
+      <li><strong>Always read Figma before building any component.</strong> Call <code class="inline">get_design_context</code> first. Never approximate from memory.</li>
+      <li><strong>All icons are in src/app/components/icons/.</strong> Check there before installing any icon package or using Fluent UI.</li>
+      <li><strong>Read the page node first, then each child.</strong> Never start coding until the full Figma hierarchy is mapped.</li>
+      <li><strong>Never place UI elements by intuition.</strong> Run/Preview/Engine controls belong in the Action Header, not the Top Nav.</li>
+      <li><strong>Never guess icon names.</strong> Read the component's children in Figma to see exactly which icon slot is used.</li>
+      <li><strong>Never use UI design tokens for code syntax colors.</strong> --primary, --accent, --destructive are for UI chrome only. SQL editors use a code-editor palette (keywords #0033B3, strings #067D17, functions #7A3E9D).</li>
+      <li><strong>Component name is the source of truth.</strong> If it's named Nav/Top Nav, read what's actually inside — don't assume based on the word "nav."</li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>
