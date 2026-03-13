@@ -7,6 +7,14 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · IconDremioLogo — Replace placeholder circles with actual brand mark SVG paths
+
+**What changed:** `components/icons/IconDremioLogo.tsx` — replaced 4 concentric `<circle>` elements (placeholder approximation) with the 14 actual Dremio brand mark SVG paths sourced from the Figma export in `mona_test_aiagent`. Colors: `#2E3336` (dark), `#31D3DB` (teal), `#FFFFFE` (white), `#2FA69F` (green-teal).
+
+**Why:** The placeholder circles rendered as a generic "weird circle" in the nav instead of the actual Dremio logo mark.
+
+---
+
 ## 2026-03-13 · Design Systems · LeftNav — Match reference design (light background, secondary-foreground icons)
 
 **What changed:**
