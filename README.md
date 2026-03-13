@@ -1,8 +1,27 @@
 # Dremio AI Agent – Design System
 
-> 👉 **[Open design-system.html](design-system.html) in your browser first** — visual color swatches, component demos, and specs.
-
 > Component specifications, design tokens, and usage guidelines for the Dremio AI Agent product surface.
+
+---
+
+## 👉 View the Visual Design Reference
+
+`design-system.html` is a single-file visual reference — live color swatches, component demos, spec tables, and code examples. **Start here before reading anything else.**
+
+**Option A — No install (recommended for PMs and new team members)**
+
+Open it instantly in your browser via [htmlpreview.github.io](https://htmlpreview.github.io/):
+
+👉 **[Click to open design-system.html](https://htmlpreview.github.io/?https://raw.githubusercontent.com/lqw145201/dremio-ai-design-system/main/design-system.html)**
+
+No cloning, no setup — just click.
+
+**Option B — Local (if you have the repo cloned)**
+
+```bash
+open design-system.html   # macOS
+# or just double-click the file in Finder / Explorer
+```
 
 ---
 
