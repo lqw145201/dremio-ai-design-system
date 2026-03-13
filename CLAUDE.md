@@ -166,8 +166,8 @@ Use `<Button>` from `src/app/components/ui/button.tsx` — never hand-build `<bu
 
 Always resolve icons in this order — stop at the first match:
 
-1. **`src/app/components/icons/`** — 101 Dremio AI Agent icons as React `.tsx` components. Check here first, always.
-2. **`public/icons/org-settings/`** — 12 org-settings SVG assets (icon-ai, icon-auditing, icon-bi, etc.)
+1. **`src/app/components/icons/`** — 101 Dremio icons as React `.tsx` components. Check here first, always.
+2. **`public/icons/`** — 113 standalone SVG assets (all icons combined in a single folder). Use as `<img src>` or in design tools when a React component is not needed.
 3. **`@fluentui/react-icons` Regular weight** — fallback only when no match exists in steps 1 or 2.
 
 **Never install a new icon package.** If a Fluent icon is used, import only the specific named export — do not add icon libraries.
