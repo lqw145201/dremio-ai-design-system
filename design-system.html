@@ -359,7 +359,7 @@
     display: inline-flex;
     flex-direction: column;
     width: 64px;
-    background: var(--sidebar);
+    background: var(--background);
     border-radius: 8px;
     padding: 12px 0;
     gap: 4px;
@@ -372,12 +372,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.55);
+    color: var(--secondary-foreground);
     font-size: 18px;
   }
   .nav-item.active {
-    background: rgba(255,255,255,0.12);
-    color: white;
+    background: rgba(33, 132, 128, 0.1);
+    color: var(--accent);
   }
 
   /* ─── Spacing reference ──────────────────────────────────── */
@@ -903,22 +903,31 @@ text-chart-5  text-[9px]  font-semibold</pre>
   <!-- ═══ §7a LEFT NAV ══════════════════════════════════════════════════════ -->
   <div class="section" id="s7a">
     <h2><span class="sec-num">07a</span>Left Navigation</h2>
-    <p>Fixed 64px-wide vertical strip on the far left. Dark background (<code class="inline">--sidebar</code>). Icon-only navigation.</p>
+    <p>Fixed 64px-wide vertical strip on the far left. Light background (<code class="inline">--background</code>). Icon + label navigation. Source: <code class="inline">components/LeftNav.tsx</code>.</p>
 
     <table class="dt">
       <thead><tr><th>Element</th><th>Spec</th></tr></thead>
       <tbody>
-        <tr><td>Container</td><td>width 64px, height 100vh, bg <code>--sidebar</code> (#2A394A), flex column</td></tr>
-        <tr><td>Logo area</td><td>64×64px, centered</td></tr>
-        <tr><td>Nav items</td><td>40×40px each, <code>rounded-[8px]</code>, centered in 64px strip</td></tr>
-        <tr><td>Icon size</td><td>24×24px</td></tr>
-        <tr><td>Default icon color</td><td><code>rgba(255,255,255,0.55)</code> — 55% white</td></tr>
-        <tr><td>Hover bg</td><td><code>rgba(255,255,255,0.08)</code></td></tr>
-        <tr><td>Active bg</td><td><code>rgba(255,255,255,0.12)</code></td></tr>
-        <tr><td>Active icon color</td><td><code>#FFFFFF</code> (full white)</td></tr>
-        <tr><td>Active indicator</td><td>2px left border, color <code>--primary</code></td></tr>
+        <tr><td>Container</td><td>width 64px, height 100vh, bg <code>--background</code> (#F6F7F8), flex column</td></tr>
+        <tr><td>Logo area</td><td>64×64px centered, <code>IconDremioLogo size={32}</code></td></tr>
+        <tr><td>Nav item layout</td><td>flex-col, icon area <code>rounded-[8px]</code> p-4px, label 12px below</td></tr>
+        <tr><td>Icon size</td><td>20×20px inside a 24×24px slot</td></tr>
+        <tr><td>Default icon/text color</td><td><code>var(--secondary-foreground)</code> (#505862) — no opacity reduction</td></tr>
+        <tr><td>Active bg</td><td><code>rgba(33, 132, 128, 0.1)</code> — 10% teal tint on icon wrapper</td></tr>
+        <tr><td>Active icon/text color</td><td><code>var(--accent)</code> (#008489) — teal</td></tr>
+        <tr><td>Active text weight</td><td>semibold (600); inactive: regular (400)</td></tr>
+        <tr><td>Bottom items</td><td>Help icon, UserAvatar, expand toggle — all <code>--secondary-foreground</code></td></tr>
       </tbody>
     </table>
+
+    <pre>&lt;LeftNav
+  activeItem="ai-agent"   // "home" | "ai-agent" | "catalog" | "sql" | "semantic-layer" | "admin"
+  userInitials="TS"       // shown in avatar circle at bottom
+  onNavigate={(item) =&gt; console.log(item)}
+/&gt;</pre>
+
+    <div class="warn"><strong>⚠ Background is <code>--background</code> (#F6F7F8), not <code>--sidebar</code>.</strong><br>
+    This matches the reference design in mona_test_aiagent. Inactive icons/text use <code>--secondary-foreground</code> (#505862) — no opacity reduction. Active items use <code>--accent</code> (#008489) with <code>rgba(33,132,128,0.1)</code> background tint.</div>
   </div>
 
   <!-- ═══ §7b TOP NAV ═══════════════════════════════════════════════════════ -->

@@ -1,7 +1,8 @@
 // COMPONENT — Left navigation sidebar
 // Portable version: no Figma svgPaths imports — uses icon components from ./icons/
-// Background: var(--sidebar) (#2A394A dark navy) — NOT var(--background)
-// Nav items: icon + label text. Active item: accent color + tinted bg.
+// Background: var(--background) (#F6F7F8 light gray) — matches mona_test_aiagent reference
+// Nav items: icon + label text. Active item: accent color + 10% tinted bg.
+// Inactive items: --secondary-foreground color, no opacity reduction.
 
 import { IconDremioLogo } from "./icons/IconDremioLogo";
 import { UserAvatar } from "./UserAvatar";
@@ -52,9 +53,8 @@ function NavItem({ icon, label, active, hasBackground, bgColor }: NavItemProps) 
         style={{
           fontFeatureSettings: "'cv08', 'lnum', 'tnum'",
           fontWeight: active ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
-          color: active ? "var(--accent, #008489)" : "var(--sidebar-foreground, #ffffff)",
+          color: active ? "var(--accent, #008489)" : "var(--secondary-foreground, #505862)",
           lineHeight: "14px",
-          opacity: active ? 1 : 0.7,
         }}
       >
         {label}
@@ -76,14 +76,13 @@ interface LeftNavProps {
 }
 
 // Icon components only accept size/className — not style. Wrap in a span so
-// currentColor + opacity apply correctly via CSS inheritance.
+// currentColor applies correctly via CSS inheritance.
 function IconWrapper({ active, children }: { active: boolean; children: React.ReactNode }) {
   return (
     <span
       style={{
         display: "flex",
-        color: active ? "var(--accent, #008489)" : "var(--sidebar-foreground, #ffffff)",
-        opacity: active ? 1 : 0.7,
+        color: active ? "var(--accent, #008489)" : "var(--secondary-foreground, #505862)",
       }}
     >
       {children}
@@ -92,16 +91,16 @@ function IconWrapper({ active, children }: { active: boolean; children: React.Re
 }
 
 // LAYOUT — Main nav container
-// ⚠️ Background MUST be #2A394A dark navy. Hex fallback is intentional —
-//    if theme.css is not imported, var(--sidebar) resolves to nothing and the
-//    nav renders white. Never remove the fallback.
+// Background: var(--background) = #F6F7F8 light gray (matches mona_test_aiagent reference).
+// ⚠️ Hex fallback is intentional — if theme.css is not imported, var(--background) resolves to
+//    nothing. Never remove the fallback.
 export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNavigate }: LeftNavProps = {}) {
   const isActive = (item: LeftNavItem) => activeItem === item;
 
   return (
     <div
       className="flex flex-col items-center justify-between shrink-0 w-[64px] h-full"
-      style={{ background: "var(--sidebar, #2A394A)" }}
+      style={{ background: "var(--background, #F6F7F8)" }}
     >
       {/* Top section: logo + nav items */}
       <div className="flex flex-col gap-[8px] items-center shrink-0 w-full">
@@ -113,7 +112,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="Home"
               active={isActive("home")}
               hasBackground={isActive("home")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("home")}><IconNavHome size={20} /></IconWrapper>}
             />
           </div>
@@ -123,7 +122,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="AI Agent"
               active={isActive("ai-agent")}
               hasBackground={isActive("ai-agent")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("ai-agent")}><IconAiAgent size={20} /></IconWrapper>}
             />
           </div>
@@ -133,7 +132,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="Catalog"
               active={isActive("catalog")}
               hasBackground={isActive("catalog")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("catalog")}><IconNavCatalog size={20} /></IconWrapper>}
             />
           </div>
@@ -143,7 +142,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="SQL"
               active={isActive("sql")}
               hasBackground={isActive("sql")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("sql")}><IconNavSqlRunner size={20} /></IconWrapper>}
             />
           </div>
@@ -153,7 +152,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="Semantic Layer"
               active={isActive("semantic-layer")}
               hasBackground={isActive("semantic-layer")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("semantic-layer")}><IconNavSemanticLayer size={20} /></IconWrapper>}
             />
           </div>
@@ -163,7 +162,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
               label="Admin"
               active={isActive("admin")}
               hasBackground={isActive("admin")}
-              bgColor="rgba(33, 132, 128, 0.2)"
+              bgColor="rgba(33, 132, 128, 0.1)"
               icon={<IconWrapper active={isActive("admin")}><IconNavSettings size={20} /></IconWrapper>}
             />
           </div>
@@ -175,7 +174,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
         {/* Help */}
         <div className="flex items-center justify-center p-[4px] cursor-pointer">
           <div className="flex items-center justify-center shrink-0 size-[24px]">
-            <span style={{ display: "flex", color: "var(--sidebar-foreground, #ffffff)", opacity: 0.7 }}>
+            <span style={{ display: "flex", color: "var(--secondary-foreground, #505862)" }}>
               <IconNavHelp size={20} />
             </span>
           </div>
@@ -187,7 +186,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
         {/* Expand/collapse nav */}
         <div className="flex items-center justify-center p-[4px] cursor-pointer">
           <div className="flex items-center justify-center shrink-0 size-[24px]">
-            <span style={{ display: "flex", color: "var(--sidebar-foreground, #ffffff)", opacity: 0.7 }}>
+            <span style={{ display: "flex", color: "var(--secondary-foreground, #505862)" }}>
               <IconNavExpandMenu size={20} />
             </span>
           </div>

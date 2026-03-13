@@ -7,6 +7,28 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · LeftNav — Match reference design (light background, secondary-foreground icons)
+
+**What changed:**
+
+`components/LeftNav.tsx`:
+- Background: `var(--sidebar, #2A394A)` → `var(--background, #F6F7F8)` — light gray to match reference in mona_test_aiagent
+- `IconWrapper` inactive color: `var(--sidebar-foreground, #ffffff)` → `var(--secondary-foreground, #505862)` — dark gray on light bg
+- Removed `opacity: 0.7` from inactive items — reference uses full-opacity `--secondary-foreground` directly
+- Active item background: `rgba(33,132,128,0.2)` → `rgba(33,132,128,0.1)` — 10% tint matches reference
+- Bottom section icons (Help, Expand): updated to use `--secondary-foreground` instead of `--sidebar-foreground`
+
+`design-system.html`:
+- Section 07a updated: background, colors, spec table, and demo styles all updated to match new design
+
+`CLAUDE.md`:
+- LeftNav Props section: updated active/inactive color documentation
+- Token table: `--sidebar` row clarified as not used by LeftNav
+
+**Why:** User pointed to `https://github.com/lqw145201/mona_test_aiagent` as the correct reference. That design uses a light background nav with dark text, not the dark navy (`--sidebar`) that was previously used. All values now match the reference exactly.
+
+---
+
 ## 2026-03-13 · Design Systems · LeftNav + CLAUDE.md — Add hex fallbacks and failure mode docs
 
 **What changed:**

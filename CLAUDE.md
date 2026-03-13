@@ -21,7 +21,7 @@ This design system repo contains the **actual source code** for every component 
 
 ### ⛔ Two failure modes that produce a broken LeftNav
 
-**Failure 1 — Missing `theme.css`:** If `styles/theme.css` is not imported, all CSS variables resolve to nothing. `LeftNav` background becomes white (should be `#2A394A` dark navy), icon/text colors disappear. **Fix:** copy `styles/theme.css` and import it at the top of your app entry point.
+**Failure 1 — Missing `theme.css`:** If `styles/theme.css` is not imported, all CSS variables resolve to nothing. `LeftNav` background becomes fully transparent, icon/text colors disappear. **Fix:** copy `styles/theme.css` and import it at the top of your app entry point.
 
 **Failure 2 — Wrong icons:** `LeftNav` uses `IconDremioLogo`, `IconNavHome`, `IconAiAgent`, `IconNavCatalog`, `IconNavSqlRunner`, `IconNavSemanticLayer`, `IconNavSettings`, `IconNavHelp`, `IconNavExpandMenu` — all from `components/icons/`. If you substitute Fluent UI, Heroicons, or any other icon library the nav will look completely wrong. **Fix:** copy the entire `components/icons/` directory into your project.
 
@@ -130,7 +130,7 @@ If you think an element "belongs" somewhere but haven't verified it in Figma —
 | `--destructive` | `#CA3F32` | Delete actions, error, ApprovalBadge text |
 | `--destructive-hover` | `#AD3021` | Destructive button hover |
 | `--background-hover` | `#F1FAFB` | Ghost button hover bg, nav item hover |
-| `--sidebar` | `#2A394A` | Left nav background |
+| `--sidebar` | `#2A394A` | Token defined but NOT used by LeftNav — LeftNav uses `--background` |
 | `--chart-5` | `#5ABD4A` | TimeBadge text + background tint (green) |
 
 **CRITICAL:** `--muted-foreground` is for placeholders/disabled ONLY. Table headers, stat labels, badge text → `--secondary-foreground`.
@@ -173,7 +173,7 @@ type LeftNavItem = "home" | "ai-agent" | "catalog" | "sql" | "semantic-layer" | 
 />
 ```
 
-All items use `rgba(33,132,128,0.2)` background + `--accent` icon/text when active. All other items are at 70% opacity with `--sidebar-foreground` color.
+Active items use `rgba(33,132,128,0.1)` background tint + `--accent` (#008489) icon/text + semibold label. Inactive items use `--secondary-foreground` (#505862) — no opacity reduction. Nav background is `--background` (#F6F7F8), not `--sidebar`.
 
 ---
 
