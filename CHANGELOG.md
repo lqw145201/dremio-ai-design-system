@@ -7,6 +7,14 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · LeftNav — Fix icon color/opacity not applying
+
+**What changed:** `components/LeftNav.tsx` — replaced `iconStyle()` helper (which passed a `style` prop directly to icon components) with an `IconWrapper` span that applies `color` and `opacity` via CSS inheritance.
+
+**Why:** All icon components in `components/icons/` only accept `size` and `className` — they do not accept a `style` prop. Passing `style={iconStyle(...)}` was silently dropped, so inactive icons rendered at full opacity with no color override (defaulting to whatever fill the SVG had), and active icons received no teal color. The `IconWrapper` span sets `color` on a parent element so `fill="currentColor"` on the SVG picks it up correctly.
+
+---
+
 ## 2026-03-13 · Design Systems · LeftNav + CLAUDE.md — Fix hardcoded active state and stale paths
 
 **What changed:**
