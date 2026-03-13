@@ -1,14 +1,21 @@
 // COMPONENT — Chat list panel with recent chats, hover "more" menu, rename/delete dialogs
+// Portable version: no Figma svgPaths imports — uses icon components from ./icons/
 // Follows design system: bg-popover, shadow-dropdown, rounded-[var(--radius-button)], hover:bg-background-hover
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import svgPaths from "../../imports/svg-javaskxvh1";
-import closeSvgPaths from "../../imports/svg-ye44z423jp";
-import warningSvgPaths from "../../imports/svg-4mzkarf672";
+import { IconMore } from "./icons/IconMore";
+import { IconClose } from "./icons/IconClose";
+import { IconWarning } from "./icons/IconWarning";
+import { IconPlus } from "./icons/IconPlus";
+import { IconSearch } from "./icons/IconSearch";
 
 // COPY
 import { CHAT_LIST, CHAT_LIST_ITEMS } from "../constants/strings";
+
+// Inline path data for collapse panel icon (viewBox: 0 0 16.6667 13.3333)
+// Source: svg-javaskxvh1.ts → p3fca0170
+const PATH_COLLAPSE_PANEL = "M10.6733 4.37417C10.6184 4.31305 10.552 4.26335 10.4779 4.22792C10.4038 4.19249 10.3234 4.17202 10.2413 4.16769C10.1593 4.16336 10.0772 4.17524 9.99976 4.20266C9.92231 4.23008 9.85104 4.2725 9.79 4.3275L7.70667 6.2025C7.64167 6.2611 7.58971 6.3327 7.55415 6.41266C7.51858 6.49262 7.5002 6.57915 7.5002 6.66667C7.5002 6.75418 7.51858 6.84071 7.55415 6.92067C7.58971 7.00063 7.64167 7.07223 7.70667 7.13083L9.79 9.00583C9.91322 9.11678 10.0755 9.17424 10.241 9.16557C10.4066 9.15689 10.562 9.0828 10.6729 8.95958C10.7839 8.83637 10.8413 8.67413 10.8326 8.50855C10.824 8.34297 10.7499 8.18762 10.6267 8.07667L9.75333 7.29167H12.7083C12.7904 7.29167 12.8717 7.2755 12.9475 7.24409C13.0233 7.21268 13.0922 7.16664 13.1503 7.10861C13.2083 7.05057 13.2543 6.98167 13.2858 6.90584C13.3172 6.83002 13.3333 6.74874 13.3333 6.66667C13.3333 6.58459 13.3172 6.50332 13.2858 6.42749C13.2543 6.35166 13.2083 6.28276 13.1503 6.22473C13.0922 6.16669 13.0233 6.12065 12.9475 6.08924C12.8717 6.05783 12.7904 6.04167 12.7083 6.04167H9.75333L10.6267 5.25667C10.7497 5.1457 10.8237 4.9904 10.8323 4.82491C10.8409 4.65942 10.7842 4.49729 10.6733 4.37417ZM0 11.0425C0.000220961 11.6501 0.241761 12.2328 0.671508 12.6624C1.10125 13.092 1.68402 13.3333 2.29167 13.3333H14.375C14.6759 13.3333 14.9739 13.2741 15.252 13.1589C15.53 13.0437 15.7827 12.8749 15.9955 12.6621C16.2083 12.4493 16.3771 12.1967 16.4922 11.9186C16.6074 11.6406 16.6667 11.3426 16.6667 11.0417V2.29167C16.6667 1.68388 16.4252 1.10098 15.9955 0.671213C15.5657 0.241443 14.9828 0 14.375 0H2.29167C1.68388 0 1.10098 0.241443 0.671214 0.671213C0.241443 1.10098 0 1.68388 0 2.29167V11.0425ZM2.29167 12.0842C1.71667 12.0842 1.25 11.6175 1.25 11.0425V2.29083C1.25 1.71583 1.71667 1.24917 2.29167 1.24917H5.00333V12.0833L2.29167 12.0842ZM6.25333 12.0842V1.25H14.375C14.95 1.25 15.4167 1.71667 15.4167 2.29167V11.0417C15.4167 11.6167 14.95 12.0833 14.375 12.0833L6.25333 12.0842Z";
 
 // STATE — Chat item type (mutable for rename)
 interface ChatItem {
@@ -21,19 +28,6 @@ interface ChatListPanelProps {
   onSelectChat: (id: number) => void;
   onCollapse: () => void;
   onChatTitleChange?: (title: string | null) => void;
-}
-
-/* ── More button (three dots) ─────────────────────────────────── */
-
-// LAYOUT — Three-dot icon for "more" actions
-function MoreIcon() {
-  return (
-    <svg width="10" height="3" viewBox="0 0 10.3333 2.33333" fill="none">
-      <path d={svgPaths.p12e12a80} fill="var(--secondary-foreground)" />
-      <path d={svgPaths.p39c2dc00} fill="var(--secondary-foreground)" />
-      <path d={svgPaths.p1a349680} fill="var(--secondary-foreground)" />
-    </svg>
-  );
 }
 
 /* ── Context menu dropdown ────────────────────────────────────── */
@@ -119,6 +113,164 @@ function ChatContextMenu({
   );
 }
 
+/* ── Rename dialog ────────────────────────────────────────────── */
+
+// LAYOUT — Rename chat dialog matching Figma ExampleFormNo spec
+function RenameDialog({
+  chatName,
+  onSave,
+  onCancel,
+}: {
+  chatName: string;
+  onSave: (newName: string) => void;
+  onCancel: () => void;
+}) {
+  // STATE
+  const [value, setValue] = useState(chatName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // INTERACTION — Auto-focus input
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/20">
+      <div
+        className="flex flex-col items-start w-[400px] bg-card rounded-[var(--radius-button)] overflow-hidden"
+        style={{ boxShadow: "var(--elevation-dropdown)" }}
+      >
+        {/* LAYOUT — Header */}
+        <div className="relative shrink-0 w-full rounded-t-[var(--radius-button)]">
+          <div className="flex flex-col items-start overflow-clip rounded-[inherit] w-full">
+            <div className="h-[56px] relative rounded-t-[var(--radius-button)] shrink-0 w-full">
+              <div className="flex flex-row items-center size-full">
+                <div className="flex gap-[16px] items-center px-[16px] size-full">
+                  {/* Title */}
+                  <div className="flex-1 flex gap-[8px] items-center min-w-0">
+                    <p
+                      className="text-foreground flex-1"
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "var(--text-lg)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      {CHAT_LIST.renameTitle}
+                    </p>
+                  </div>
+                  {/* Close button */}
+                  <button
+                    type="button"
+                    className="shrink-0 size-[24px] flex items-center justify-center cursor-pointer rounded-[var(--radius-button)] hover:bg-muted transition-colors"
+                    onClick={onCancel}
+                  >
+                    <IconClose size={12} style={{ color: "var(--secondary-foreground)" }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div aria-hidden="true" className="absolute border-muted border-b border-solid inset-0 pointer-events-none rounded-t-[var(--radius-button)]" />
+        </div>
+
+        {/* LAYOUT — Body: form field */}
+        <div className="shrink-0 w-full bg-card">
+          <div className="flex flex-col gap-[24px] items-start p-[16px] w-full">
+            <div className="flex flex-col gap-[4px] items-start w-full">
+              {/* Field label */}
+              <div className="flex gap-[8px] items-center w-full">
+                <p
+                  className="text-foreground"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--text-base)",
+                    fontWeight: "var(--font-weight-normal)",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  {CHAT_LIST.chatNameLabel}
+                </p>
+              </div>
+              {/* Input */}
+              <div className="bg-input relative rounded-[var(--radius-button)] shrink-0 w-full h-[32px]">
+                <div aria-hidden="true" className="absolute border border-border border-solid inset-0 pointer-events-none rounded-[var(--radius-button)]" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="w-full h-full px-[8px] bg-transparent outline-none text-foreground"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--text-base)",
+                    fontWeight: "var(--font-weight-normal)",
+                    lineHeight: "1.5",
+                  }}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") onSave(value); if (e.key === "Escape") onCancel(); }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* LAYOUT — Footer: Cancel + Save buttons */}
+        <div className="bg-card h-[55px] relative rounded-b-[var(--radius-button)] shrink-0 w-full">
+          <div className="flex flex-col items-end justify-end overflow-clip rounded-[inherit] size-full">
+            <div className="flex gap-[8px] h-[55px] items-center justify-end px-[16px] shrink-0">
+              {/* Cancel */}
+              <button
+                type="button"
+                className="bg-card relative h-[32px] w-[100px] rounded-[var(--radius-button)] cursor-pointer hover:bg-muted transition-colors"
+                onClick={onCancel}
+              >
+                <div aria-hidden="true" className="absolute border border-border border-solid inset-0 pointer-events-none rounded-[var(--radius-button)]" />
+                <div className="flex items-center justify-center size-full">
+                  <p
+                    className="text-secondary-foreground whitespace-nowrap"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--text-base)",
+                      fontWeight: 500,
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {CHAT_LIST.cancel}
+                  </p>
+                </div>
+              </button>
+              {/* Save */}
+              <button
+                type="button"
+                className="bg-primary h-[32px] w-[100px] rounded-[var(--radius-button)] cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => onSave(value)}
+              >
+                <div className="flex items-center justify-center size-full">
+                  <p
+                    className="text-primary-foreground whitespace-nowrap"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--text-base)",
+                      fontWeight: 500,
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {CHAT_LIST.save}
+                  </p>
+                </div>
+              </button>
+            </div>
+          </div>
+          <div aria-hidden="true" className="absolute border-muted border-solid border-t inset-0 pointer-events-none rounded-b-[var(--radius-button)]" />
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ── Delete confirmation dialog ───────────────────────────────── */
 
 // LAYOUT — Delete chat dialog matching Figma ExampleDialog spec
@@ -143,12 +295,8 @@ function DeleteDialog({
             <div className="flex flex-row items-center size-full">
               <div className="flex gap-[8px] items-center px-[16px] py-[10px] size-full">
                 {/* Warning icon */}
-                <div className="relative shrink-0 size-[24px]">
-                  <div className="absolute inset-[8.33%]">
-                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                      <path d={warningSvgPaths.p3d0c7e00} fill="var(--secondary-foreground)" />
-                    </svg>
-                  </div>
+                <div className="shrink-0 size-[24px] flex items-center justify-center">
+                  <IconWarning size={20} style={{ color: "var(--secondary-foreground)" }} />
                 </div>
                 {/* Title */}
                 <p
@@ -165,14 +313,10 @@ function DeleteDialog({
                 {/* Close button */}
                 <button
                   type="button"
-                  className="relative shrink-0 size-[24px] cursor-pointer rounded-[var(--radius-button)] hover:bg-muted transition-colors"
+                  className="shrink-0 size-[24px] flex items-center justify-center cursor-pointer rounded-[var(--radius-button)] hover:bg-muted transition-colors"
                   onClick={onCancel}
                 >
-                  <div className="absolute inset-[17.67%_17.67%_17.71%_17.71%]">
-                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.5094 15.5094">
-                      <path d={closeSvgPaths.pcf7f70} fill="var(--secondary-foreground)" />
-                    </svg>
-                  </div>
+                  <IconClose size={12} style={{ color: "var(--secondary-foreground)" }} />
                 </button>
               </div>
             </div>
@@ -261,34 +405,24 @@ function DeleteDialog({
 
 /* ── Single chat row ──────────────────────────────────────────── */
 
-// LAYOUT — Chat list item with hover "more" button and inline rename
+// LAYOUT — Chat list item with hover "more" button
 function ChatItemRow({
   chat,
   isSelected,
-  isRenaming,
   onSelect,
   onRename,
   onDelete,
-  onRenameCommit,
 }: {
   chat: ChatItem;
   isSelected: boolean;
-  isRenaming: boolean;
   onSelect: () => void;
   onRename: (id: number) => void;
   onDelete: (id: number) => void;
-  onRenameCommit: (newName: string | null) => void;
 }) {
   // STATE
   const [menuOpen, setMenuOpen] = useState(false);
   const moreRef = useRef<HTMLButtonElement>(null);
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
-  const committedRef = useRef(false);
-
-  // INTERACTION — Reset commit flag when entering rename mode
-  useEffect(() => {
-    if (isRenaming) committedRef.current = false;
-  }, [isRenaming]);
 
   // INTERACTION — Open context menu
   const handleMore = useCallback((e: React.MouseEvent) => {
@@ -301,68 +435,35 @@ function ChatItemRow({
 
   return (
     <div
-      className={`group relative rounded-[var(--radius-button)] shrink-0 w-full transition-colors ${
-        isRenaming ? "bg-muted" : isSelected ? "bg-muted cursor-pointer" : "hover:bg-muted/50 cursor-pointer"
+      className={`group relative rounded-[var(--radius-button)] shrink-0 w-full cursor-pointer transition-colors ${
+        isSelected ? "bg-muted" : "hover:bg-muted/50"
       }`}
-      onClick={isRenaming ? undefined : onSelect}
+      onClick={onSelect}
     >
       <div className="flex items-center px-[12px] py-[8px] w-full">
-        {isRenaming ? (
-          // INTERACTION — Inline rename input
-          <input
-            type="text"
-            defaultValue={chat.title}
-            autoFocus
-            className="flex-1 min-w-0 bg-transparent outline-none text-foreground"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-base)",
-              fontWeight: isSelected ? 500 : "var(--font-weight-normal)",
-              lineHeight: "1.5",
-            }}
-            onFocus={(e) => e.target.select()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                committedRef.current = true;
-                onRenameCommit(e.currentTarget.value.trim() || null);
-              } else if (e.key === "Escape") {
-                committedRef.current = true;
-                onRenameCommit(null);
-              }
-            }}
-            onBlur={(e) => {
-              if (committedRef.current) return;
-              committedRef.current = true;
-              onRenameCommit(e.target.value.trim() || null);
-            }}
-          />
-        ) : (
-          <p
-            className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-foreground min-w-0"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-base)",
-              fontWeight: isSelected ? 500 : "var(--font-weight-normal)",
-              lineHeight: "1.5",
-            }}
-          >
-            {chat.title}
-          </p>
-        )}
+        <p
+          className={`flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-foreground min-w-0`}
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--text-base)",
+            fontWeight: isSelected ? 500 : "var(--font-weight-normal)",
+            lineHeight: "1.5",
+          }}
+        >
+          {chat.title}
+        </p>
 
-        {/* INTERACTION — More button (hidden during rename) */}
-        {!isRenaming && (
-          <button
-            ref={moreRef}
-            type="button"
-            className={`shrink-0 size-[24px] flex items-center justify-center rounded-[var(--radius-button)] cursor-pointer hover:bg-muted transition-all ${
-              menuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-            }`}
-            onClick={handleMore}
-          >
-            <MoreIcon />
-          </button>
-        )}
+        {/* INTERACTION — More button (visible on hover or when menu is open) */}
+        <button
+          ref={moreRef}
+          type="button"
+          className={`shrink-0 size-[24px] flex items-center justify-center rounded-[var(--radius-button)] cursor-pointer hover:bg-muted transition-all ${
+            menuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
+          onClick={handleMore}
+        >
+          <IconMore size={16} style={{ color: "var(--secondary-foreground)" }} />
+        </button>
       </div>
 
       {/* LAYOUT — Context menu dropdown */}
@@ -386,29 +487,33 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
     CHAT_LIST_ITEMS.map((c) => ({ id: c.id, title: c.title })),
   );
 
-  // STATE — Inline rename and delete
-  const [renamingId, setRenamingId] = useState<number | null>(null);
+  // STATE — Dialog management
+  const [renameTarget, setRenameTarget] = useState<ChatItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ChatItem | null>(null);
 
-  // INTERACTION — Start inline rename
-  const handleRenameRequest = useCallback((id: number) => {
-    setRenamingId(id);
-  }, []);
+  // INTERACTION — Rename
+  const handleRenameRequest = useCallback(
+    (id: number) => {
+      const chat = chats.find((c) => c.id === id);
+      if (chat) setRenameTarget(chat);
+    },
+    [chats],
+  );
 
-  // INTERACTION — Commit inline rename (null = cancelled)
-  const handleRenameCommit = useCallback(
-    (newName: string | null) => {
-      if (newName && renamingId !== null) {
+  const handleRenameSave = useCallback(
+    (newName: string) => {
+      if (renameTarget && newName.trim()) {
         setChats((prev) =>
-          prev.map((c) => (c.id === renamingId ? { ...c, title: newName } : c)),
+          prev.map((c) => (c.id === renameTarget.id ? { ...c, title: newName.trim() } : c)),
         );
-        if (renamingId === selectedChat && onChatTitleChange) {
-          onChatTitleChange(newName);
+        // INTERACTION — Notify parent if renamed chat is the currently selected one
+        if (renameTarget.id === selectedChat && onChatTitleChange) {
+          onChatTitleChange(newName.trim());
         }
       }
-      setRenamingId(null);
+      setRenameTarget(null);
     },
-    [renamingId, onChatTitleChange, selectedChat],
+    [renameTarget, onChatTitleChange, selectedChat],
   );
 
   // INTERACTION — Delete
@@ -436,12 +541,8 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
           onClick={() => { onSelectChat(-1); onChatTitleChange?.(null); }}
         >
           <div className="flex items-center size-full px-[6px] gap-[8px]">
-            <div className="relative shrink-0 size-[20px]">
-              <div className="absolute inset-[8.33%]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16.6667 16.6675">
-                  <path d={svgPaths.p4d89000} fill="var(--secondary-foreground)" />
-                </svg>
-              </div>
+            <div className="flex items-center justify-center shrink-0 size-[20px]">
+              <IconPlus size={16} style={{ color: "var(--secondary-foreground)" }} />
             </div>
             <p
               className="text-secondary-foreground"
@@ -460,12 +561,8 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
         {/* LAYOUT — Search chats button */}
         <div className="h-[32px] shrink-0 w-full rounded-[var(--radius-card)] cursor-pointer hover:bg-muted transition-colors">
           <div className="flex items-center size-full px-[6px] gap-[8px]">
-            <div className="relative shrink-0 size-[20px]">
-              <div className="absolute inset-[11.46%_13.54%_13.54%_11.46%]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0003 15.0009">
-                  <path d={svgPaths.p162ebe00} fill="var(--secondary-foreground)" />
-                </svg>
-              </div>
+            <div className="flex items-center justify-center shrink-0 size-[20px]">
+              <IconSearch size={16} style={{ color: "var(--secondary-foreground)" }} />
             </div>
             <p
               className="text-secondary-foreground"
@@ -506,11 +603,9 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
               key={chat.id}
               chat={chat}
               isSelected={selectedChat === chat.id}
-              isRenaming={renamingId === chat.id}
               onSelect={() => { onSelectChat(chat.id); onChatTitleChange?.(chat.title); }}
               onRename={handleRenameRequest}
               onDelete={handleDeleteRequest}
-              onRenameCommit={handleRenameCommit}
             />
           ))}
         </div>
@@ -523,10 +618,11 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
           onClick={onCollapse}
         >
           <div className="flex items-center gap-[8px] px-[12px] size-full">
+            {/* Collapse panel icon — non-standard viewBox 16.6667×13.3333, inline path */}
             <div className="relative shrink-0 size-[20px]">
               <div className="absolute inset-[16.67%_8.33%]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16.6667 13.3333">
-                  <path d={svgPaths.p3fca0170} fill="var(--secondary-foreground)" />
+                  <path d={PATH_COLLAPSE_PANEL} fill="var(--secondary-foreground)" />
                 </svg>
               </div>
             </div>
@@ -545,7 +641,14 @@ export function ChatListPanel({ selectedChat, onSelectChat, onCollapse, onChatTi
         </div>
       </div>
 
-      {/* LAYOUT — Delete dialog */}
+      {/* LAYOUT — Dialogs */}
+      {renameTarget && (
+        <RenameDialog
+          chatName={renameTarget.title}
+          onSave={handleRenameSave}
+          onCancel={() => setRenameTarget(null)}
+        />
+      )}
       {deleteTarget && (
         <DeleteDialog
           chatName={deleteTarget.title}

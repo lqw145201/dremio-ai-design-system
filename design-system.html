@@ -505,6 +505,8 @@
       <div><a href="#s14"><span class="toc-num">14</span>Critical Rules</a></div>
       <div><a href="#s7b"><span class="toc-num">07b</span>Top Navigation</a></div>
       <div><a href="#s15"><span class="toc-num">15</span>Chat List Panel</a></div>
+      <div><a href="#s16"><span class="toc-num">16</span>Message Bubbles &amp; Typing</a></div>
+      <div><a href="#s17"><span class="toc-num">17</span>User Avatar</a></div>
     </div>
   </div>
 
@@ -517,14 +519,29 @@
     <table class="dt">
       <thead><tr><th>Path</th><th>Contents</th></tr></thead>
       <tbody>
-        <tr><td><code>src/app/pages/AIAgentPage.tsx</code></td><td>Root page — mounts the full 4-panel layout</td></tr>
-        <tr><td><code>src/app/components/</code></td><td>LeftNav, TopNav, ChatListPanel, ChatPanel, WorkspacePanel, CatalogPanel, ChatInput, CollapsedPanelStrip</td></tr>
-        <tr><td><code>src/app/components/ui/</code></td><td>Shared primitives: Button, Table, Badge</td></tr>
-        <tr><td><code>src/app/components/icons/</code></td><td>106 Dremio SVG icons — check here before installing any icon package</td></tr>
-        <tr><td><code>src/app/hooks/</code></td><td>usePanelLayout, useWorkspace, useChat</td></tr>
-        <tr><td><code>src/styles/theme.css</code></td><td>All CSS custom property tokens</td></tr>
+        <tr><td><code>AIAgentPage.tsx</code></td><td>Root page — mounts the full 4-panel layout (design-system root)</td></tr>
+        <tr><td><code>src/app/pages/AIAgentPage.tsx</code></td><td>Root page — in the prototype project</td></tr>
+        <tr><td><code>components/</code></td><td>LeftNav, TopNav, ChatListPanel, ChatPanel, WorkspacePanel, CatalogPanel, ChatInput, CollapsedPanelStrip, ToolCallsBlock, UserMessageBubble, UserAvatar</td></tr>
+        <tr><td><code>components/ui/</code></td><td>Shared primitives: Button, Table, Badge</td></tr>
+        <tr><td><code>components/icons/</code></td><td>101 Dremio SVG icon components — check here before installing any icon package</td></tr>
+        <tr><td><code>hooks/</code></td><td>usePanelLayout, useWorkspace, useChat</td></tr>
+        <tr><td><code>constants/strings.ts</code></td><td>All UI copy strings and labels — never hardcode inline text</td></tr>
+        <tr><td><code>services/mock-responses.ts</code></td><td>Mock AI response data for prototyping and demos</td></tr>
+        <tr><td><code>styles/theme.css</code></td><td>All CSS custom property tokens</td></tr>
       </tbody>
     </table>
+
+    <h3>Portable Icon Strategy</h3>
+    <p>This design system is <strong>fully portable</strong> — it contains no Figma-generated <code class="inline">svgPaths</code> imports. All icon SVG data is resolved using one of three strategies:</p>
+    <table class="dt">
+      <thead><tr><th>Strategy</th><th>When to use</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Named icon component (<code>IconXxx</code>)</td><td>Standard Dremio icons matching a file in <code>components/icons/</code></td><td><code>&lt;IconSearch size={20} /&gt;</code></td></tr>
+        <tr><td>Inline <code>PATH_XXX</code> constant</td><td>Non-standard viewBox icons unique to a specific component (not generic icons)</td><td><code>const PATH_CHEVRON = "M9.69…"</code></td></tr>
+        <tr><td>Standard CSS animation</td><td>Spinners / loading states</td><td><code>border-t-transparent animate-spin</code></td></tr>
+      </tbody>
+    </table>
+    <div class="note">Inline PATH constants are declared at the top of the component file. The <code>viewBox</code> values must exactly match the path data — they are extracted from the original Figma export and are not interchangeable with standard 24×24 icon sizes.</div>
 
     <h3>4-Panel Layout</h3>
     <pre>AIAgentPage
@@ -957,32 +974,46 @@ text-chart-5  text-[9px]  font-semibold</pre>
   <!-- ═══ §8 CHAT PANEL ════════════════════════════════════════════════════ -->
   <div class="section" id="s8">
     <h2><span class="sec-num">08</span>Chat Panel</h2>
-    <p>Source: <code class="inline">src/app/components/ChatPanel.tsx</code>. The main conversation view — renders message blocks with badges.</p>
+    <p>Source: <code class="inline">components/ChatPanel.tsx</code>. The main conversation view — renders user message bubbles, AI response text, tool call blocks, output blocks, and approval blocks.</p>
 
-    <h3>Message Block Structure</h3>
+    <h3>Message Types</h3>
+    <table class="dt">
+      <thead><tr><th>Message type</th><th>Visual treatment</th></tr></thead>
+      <tbody>
+        <tr><td>User message</td><td><code>UserMessageBubble</code> — <code>bg-muted</code> card, right-aligned, asymmetric radius (see §16)</td></tr>
+        <tr><td>AI response</td><td><strong>No background.</strong> Plain text directly in the flow, left-aligned. Never wrap in a card or bubble.</td></tr>
+        <tr><td>AI typing indicator</td><td><code>AITypingIndicator</code> — 3 bouncing dots, <code>bg-accent/60</code> fill (see §16)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Output Block Structure</h3>
     <table class="dt">
       <thead><tr><th>Element</th><th>Spec</th></tr></thead>
       <tbody>
         <tr><td>Block container</td><td><code>px-[24px] py-[16px]</code>, border-bottom 1px <code>--muted</code></td></tr>
         <tr><td>Block header row</td><td>flex, align-items center, gap-[8px], mb-[8px]</td></tr>
-        <tr><td>BlockTypeBadge</td><td>See §5 Badges. Positioned in header row.</td></tr>
-        <tr><td>TimeBadge</td><td>See §5 Badges. Shown after BlockTypeBadge.</td></tr>
-        <tr><td>ApprovalBadge</td><td>See §5 Badges. Shown when approval needed.</td></tr>
+        <tr><td>BlockTypeBadge</td><td>See §5. Positioned in header row.</td></tr>
+        <tr><td>TimeBadge</td><td>See §5. Shown after BlockTypeBadge.</td></tr>
+        <tr><td>ApprovalBadge</td><td>See §5. Shown when approval needed.</td></tr>
         <tr><td>Block content</td><td>Varies by type: SQL editor, table, chart, markdown text</td></tr>
       </tbody>
     </table>
 
     <h3>Tool Calls Block</h3>
+    <p>Source: <code class="inline">components/ToolCallsBlock.tsx</code>. Inline collapsible block that shows AI agent processing steps.</p>
     <table class="dt">
       <thead><tr><th>State</th><th>Style</th></tr></thead>
       <tbody>
-        <tr><td>Collapsed (default)</td><td>Single row, tool icon + name + count badge, ghost bg</td></tr>
-        <tr><td>Expanded</td><td>List of individual tool call rows with name, status, duration</td></tr>
-        <tr><td>Running tool</td><td>Spinning <code>--primary</code> border circle (dasharray animation)</td></tr>
-        <tr><td>Complete</td><td>Filled <code>--primary</code> circle with checkmark</td></tr>
-        <tr><td>Error</td><td><code>--destructive</code> circle with × icon</td></tr>
+        <tr><td>Collapsed (default)</td><td>Single row: status dot + summary text ("Used N tools") + chevron</td></tr>
+        <tr><td>Expanded</td><td>Timeline list of step rows with title, duration, status dot</td></tr>
+        <tr><td>Step: running</td><td>Spinning <code>--primary</code> border circle (<code>border-t-transparent animate-spin</code>)</td></tr>
+        <tr><td>Step: completed</td><td>Filled green checkmark circle — inline PATH_STEP_COMPLETED constant</td></tr>
+        <tr><td>Step: failed</td><td>Hex warning icon — inline PATH_STEP_FAILED constant, <code>--destructive</code> fill</td></tr>
+        <tr><td>Step: pending</td><td>6px muted dot (<code>bg-muted-foreground/40</code>)</td></tr>
+        <tr><td>Step detail rows</td><td>Description text, arguments code block (with copy button), result text</td></tr>
       </tbody>
     </table>
+    <div class="note">ToolCallsBlock uses inline PATH constants (non-standard viewBoxes: 13.334×13.334, 11.666×13.4212, 10.4397×5.96941) rather than icon components. Auto-expands when any step is <code>running</code>.</div>
   </div>
 
   <!-- ═══ §9 CHAT INPUT ════════════════════════════════════════════════════ -->
@@ -1007,30 +1038,71 @@ text-chart-5  text-[9px]  font-semibold</pre>
   <!-- ═══ §10 WORKSPACE PANEL ══════════════════════════════════════════════ -->
   <div class="section" id="s10">
     <h2><span class="sec-num">10</span>Workspace Panel</h2>
-    <p>Source: <code class="inline">src/app/components/WorkspacePanel.tsx</code>. Right-side panel showing the AI's execution plan and outputs.</p>
+    <p>Source: <code class="inline">components/WorkspacePanel.tsx</code>. Right-side panel with three stacked sections: <strong>Plan</strong>, <strong>Outputs</strong>, and <strong>Context</strong>. All three are internal sub-components (<code class="inline">PlanSection</code>, <code class="inline">OutputsSection</code>, <code class="inline">ContextSection</code>) plus a shared <code class="inline">RightSectionHeader</code>.</p>
 
-    <h3>Plan Tab — Step States</h3>
+    <h3>Section Header (<code>RightSectionHeader</code>)</h3>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Height</td><td><code>h-[32px]</code>, <code>px-[12px]</code></td></tr>
+        <tr><td>Label</td><td>9px semibold uppercase, <code>--secondary-foreground</code>, letter-spacing 0.5px</td></tr>
+        <tr><td>Count pill</td><td><code>bg-muted</code>, <code>h-[16px]</code>, <code>px-[5px]</code>, <code>rounded-[3px]</code>, 9px regular <code>--muted-foreground</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Plan Section — Step States</h3>
     <table class="dt">
       <thead><tr><th>State</th><th>Icon</th><th>Style</th></tr></thead>
       <tbody>
-        <tr><td>Done</td><td>Filled circle + checkmark</td><td>Circle fill <code>--chart-5</code> (#277ABD), icon white</td></tr>
-        <tr><td>Running</td><td>Spinning dashed circle</td><td>Stroke <code>--primary</code>, stroke-dasharray animation</td></tr>
-        <tr><td>Pending</td><td>Empty circle</td><td>Stroke <code>--border</code> only, no fill</td></tr>
-        <tr><td>Error</td><td>Circle + ×</td><td>Circle fill <code>--destructive</code>, icon white</td></tr>
+        <tr><td>Done</td><td>13×13 circle + checkmark path</td><td>Circle fill <code>rgba(90,189,74,0.12)</code>, stroke <code>rgba(90,189,74,0.6)</code>; checkmark stroke <code>--chart-5</code></td></tr>
+        <tr><td>Running</td><td>13×13 spinning dashed circle</td><td>Stroke <code>--primary</code>, <code>strokeDasharray="16 18"</code>, <code>animation: spin 1s linear infinite</code></td></tr>
+        <tr><td>Pending</td><td>13×13 empty circle</td><td>Stroke <code>--border</code> only, no fill</td></tr>
+      </tbody>
+    </table>
+    <table class="dt" style="margin-top:8px">
+      <thead><tr><th>Text element</th><th>Style</th></tr></thead>
+      <tbody>
+        <tr><td>Step label (done/running)</td><td>text-sm, <code>--foreground</code></td></tr>
+        <tr><td>Step label (pending)</td><td>text-sm, <code>--muted-foreground</code></td></tr>
+        <tr><td>Step detail line</td><td>9px, <code>--muted-foreground</code></td></tr>
+        <tr><td>Row padding</td><td><code>px-[12px] py-[4px]</code>, icon+text gap <code>gap-[8px]</code></td></tr>
       </tbody>
     </table>
 
-    <h3>Output Tab — Item States</h3>
+    <h3>Outputs Section — Item States</h3>
     <table class="dt">
       <thead><tr><th>State</th><th>Style</th></tr></thead>
       <tbody>
-        <tr><td>Active output item</td><td><code>bg-primary/10</code>, left border 2px <code>--primary</code></td></tr>
-        <tr><td>Hover (inactive)</td><td><code>hover:bg-background-hover</code></td></tr>
-        <tr><td>Item padding</td><td><code>px-[12px] py-[6px]</code></td></tr>
-        <tr><td>Item label</td><td>text-base, <code>--foreground</code></td></tr>
-        <tr><td>Item type badge</td><td>Same as BlockTypeBadge (§5)</td></tr>
+        <tr><td>Active</td><td><code>bg-primary/10</code>; label text-sm semibold <code>--foreground</code>; 6px filled <code>bg-primary</code> dot on right</td></tr>
+        <tr><td>Hover (inactive)</td><td><code>hover:bg-background-hover</code>; label text-sm regular <code>--secondary-foreground</code></td></tr>
+        <tr><td>Row padding</td><td><code>px-[12px] py-[6px]</code>, icon+label gap <code>gap-[8px]</code></td></tr>
+        <tr><td>Type badge</td><td><code>BlockTypeBadge</code> — see §5</td></tr>
+        <tr><td>List order</td><td>Reversed (newest first)</td></tr>
       </tbody>
     </table>
+
+    <h3>Context Section</h3>
+    <p>Shows the data sources currently loaded into the agent's context window. Each item is a table or view with a path and row count.</p>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Row height</td><td><code>py-[5px] px-[12px]</code></td></tr>
+        <tr><td>Row hover</td><td><code>hover:bg-background-hover</code></td></tr>
+        <tr><td>Icon — table type</td><td><code>&lt;IconEntityTable size={16} /&gt;</code></td></tr>
+        <tr><td>Icon — view type</td><td><code>&lt;IconEntityView size={16} /&gt;</code></td></tr>
+        <tr><td>Path text</td><td>text-sm, <code>--foreground</code>, truncate</td></tr>
+        <tr><td>Detail line (row count)</td><td>9px, <code>--muted-foreground</code></td></tr>
+        <tr><td>Icon + text gap</td><td><code>gap-[8px]</code></td></tr>
+      </tbody>
+    </table>
+    <pre>// Context item row structure
+&lt;div className="flex items-center gap-[8px] px-[12px] py-[5px] hover:bg-background-hover"&gt;
+  &lt;IconEntityTable size={16} /&gt;       {/* or IconEntityView */}
+  &lt;div className="flex-1 min-w-0"&gt;
+    &lt;p className="text-foreground truncate"&gt;crm.raw_customers&lt;/p&gt;
+    &lt;p className="text-muted-foreground" style="font-size:9px"&gt;2.4M rows&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
   </div>
 
   <!-- ═══ §11 CATALOG PANEL ════════════════════════════════════════════════ -->
@@ -1081,6 +1153,72 @@ text-chart-5  text-[9px]  font-semibold</pre>
     </table>
   </div>
 
+  <!-- ═══ §16 MESSAGE BUBBLES & TYPING ════════════════════════════════════ -->
+  <div class="section" id="s16">
+    <h2><span class="sec-num">16</span>Message Bubbles &amp; Typing Indicator</h2>
+    <p>Source: <code class="inline">components/UserMessageBubble.tsx</code>. Exports three components: <code class="inline">UserMessageBubble</code>, <code class="inline">UserMessageText</code>, and <code class="inline">AITypingIndicator</code>.</p>
+
+    <h3>UserMessageBubble</h3>
+    <p>Wraps user-sent messages in a right-aligned <code>bg-muted</code> card with a speech-bubble asymmetric corner radius.</p>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Background</td><td><code>bg-muted</code> (#EEEFF1)</td></tr>
+        <tr><td>Alignment</td><td>Right-aligned (<code>justify-end</code>)</td></tr>
+        <tr><td>Max width</td><td><code>max-w-[80%]</code></td></tr>
+        <tr><td>Radius — top-left</td><td><code>var(--radius-card)</code> = 8px (full round)</td></tr>
+        <tr><td>Radius — top-right</td><td><code>var(--radius-card)</code> = 8px (full round)</td></tr>
+        <tr><td>Radius — bottom-right</td><td><code>var(--radius-button)</code> = 4px (sharp corner — speech bubble tail side)</td></tr>
+        <tr><td>Radius — bottom-left</td><td><code>var(--radius-card)</code> = 8px (full round)</td></tr>
+        <tr><td>Inner padding</td><td><code>px-[16px] py-[8px]</code></td></tr>
+      </tbody>
+    </table>
+    <pre>// Usage
+&lt;UserMessageBubble&gt;
+  &lt;UserMessageText&gt;What datasets are available?&lt;/UserMessageText&gt;
+&lt;/UserMessageBubble&gt;</pre>
+
+    <h3>UserMessageText</h3>
+    <p>Text content inside a user bubble. <code>text-base</code>, <code>--foreground</code>, <code>font-normal</code>.</p>
+
+    <h3>AI Message — No Bubble</h3>
+    <div class="warn"><strong>AI responses never use a bubble.</strong> AI message text is rendered directly in the flow with no background, no border, and no wrapper card. Only user messages get the <code>UserMessageBubble</code> treatment.</div>
+
+    <h3>AITypingIndicator</h3>
+    <p>Shown while the AI is generating a response. Three dots with staggered bounce animation.</p>
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Layout</td><td>Flex row, <code>gap-[4px]</code>, left-aligned (no bubble wrapper)</td></tr>
+        <tr><td>Dot size</td><td><code>size-[6px]</code>, <code>rounded-full</code></td></tr>
+        <tr><td>Dot color</td><td><code>bg-accent/60</code> (60% opacity teal)</td></tr>
+        <tr><td>Animation</td><td><code>animate-bounce</code> with staggered <code>animation-delay</code>: 0ms, 150ms, 300ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ §17 USER AVATAR ════════════════════════════════════════════════════ -->
+  <div class="section" id="s17">
+    <h2><span class="sec-num">17</span>User Avatar</h2>
+    <p>Source: <code class="inline">components/UserAvatar.tsx</code>. Circular initials avatar used in LeftNav (bottom section) and any context where the current user is represented.</p>
+
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Shape</td><td><code>rounded-full</code></td></tr>
+        <tr><td>Default size</td><td>24px in LeftNav (<code>size={24}</code>)</td></tr>
+        <tr><td>Background</td><td><code>--sidebar-primary</code> (#2E92A1) — teal circle</td></tr>
+        <tr><td>Text</td><td>Initials string (e.g. "TS"), white, <code>text-sm</code>, <code>font-semibold</code></td></tr>
+        <tr><td>Props</td><td><code>initials: string</code>, <code>size?: number</code> (default 32)</td></tr>
+      </tbody>
+    </table>
+
+    <pre>// Usage in LeftNav
+&lt;UserAvatar initials="TS" size={24} /&gt;</pre>
+
+    <div class="note">The <code>size</code> prop controls both width and height in pixels. Font size scales automatically (roughly half of container size). Use <code>size={24}</code> for nav contexts, <code>size={32}</code> for larger profile surfaces.</div>
+  </div>
+
   <!-- ═══ §13 PANEL INTERACTIONS ═══════════════════════════════════════════ -->
   <div class="section" id="s13">
     <h2><span class="sec-num">13</span>Panel Layout &amp; Interactions</h2>
@@ -1129,6 +1267,9 @@ text-chart-5  text-[9px]  font-semibold</pre>
       <li><strong>Never guess icon names.</strong> Read the component's children in Figma to see exactly which icon slot is used.</li>
       <li><strong>Never use UI design tokens for code syntax colors.</strong> --primary, --accent, --destructive are for UI chrome only. SQL editors use a code-editor palette (keywords #0033B3, strings #067D17, functions #7A3E9D).</li>
       <li><strong>Component name is the source of truth.</strong> If it's named Nav/Top Nav, read what's actually inside — don't assume based on the word "nav."</li>
+      <li><strong>Never import svgPaths from Figma-generated files.</strong> This design system is portable — all icons use named <code class="inline">IconXxx</code> components or inline <code class="inline">PATH_XXX</code> constants. Never add <code class="inline">import svgPaths from "../../imports/svg-*"</code>.</li>
+      <li><strong>AI responses have no message bubble.</strong> Only user messages get <code class="inline">UserMessageBubble</code>. AI text is plain, unboxed, left-aligned. Never wrap AI output in a card or tinted background.</li>
+      <li><strong>UserMessageBubble uses asymmetric radius.</strong> All corners 8px except bottom-right which is 4px — the "speech-bubble tail" side. Never apply uniform <code class="inline">rounded-lg</code> to user messages.</li>
     </ol>
   </div>
 

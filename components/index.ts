@@ -20,6 +20,9 @@ export { WorkspacePanel } from './WorkspacePanel';
 export { CatalogPanel } from './CatalogPanel';
 export { CollapsedPanelStrip } from './CollapsedPanelStrip';
 export { ToolCallsBlock } from './ToolCallsBlock';
+export { ChatInput } from './ChatInput';
+export { UserMessageBubble, UserMessageText, AITypingIndicator } from './UserMessageBubble';
+export { UserAvatar } from './UserAvatar';
 
 // ── UI primitives ─────────────────────────────────────────────────────────
 export * from './ui';

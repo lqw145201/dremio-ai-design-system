@@ -1,14 +1,25 @@
 // COMPONENT — Inline collapsible tool calls display for AI agent processing steps
-// Modeled after Claude's tool-use UX: subtle muted annotation, auto-collapsed when done
+// Portable version: no Figma svgPaths imports — uses inline paths for small non-standard viewBoxes
 // Collapsed = single 12px muted line; Expanded = lightweight timeline with step details
 
 import { useState, useCallback } from "react";
 import type { ToolCallGroup, ToolCallStatus } from "../hooks/useChat";
-import toolCallSvgPaths from "../../imports/svg-fskxk9xcpw";
-import svgPaths from "../../imports/svg-javaskxvh1";
+import { IconCopy } from "./icons/IconCopy";
 
 // COPY
 import { TOOL_CALLS } from "../constants/strings";
+
+// Inline path data for small non-standard viewBox icons used in tool call timeline
+// Source: mona_test_aiagent/src/imports/svg-fskxk9xcpw.ts
+
+// Check circle for completed step (viewBox: 0 0 13.334 13.334)
+const PATH_STEP_COMPLETED = "M6.66699 0C10.3489 9.66338e-08 13.334 2.98509 13.334 6.66699C13.334 10.3489 10.3489 13.334 6.66699 13.334C2.98509 13.334 9.6637e-08 10.3489 0 6.66699C0 2.98509 2.98509 0 6.66699 0ZM9.79688 3.94336C9.71296 3.94484 9.6294 3.96291 9.55273 3.99707C9.47635 4.03117 9.40765 4.08044 9.35059 4.1416L5.625 7.86719L3.9834 6.22559C3.865 6.11526 3.70868 6.05484 3.54688 6.05762C3.38496 6.06047 3.22975 6.12572 3.11523 6.24023C3.00075 6.35474 2.93547 6.50997 2.93262 6.67188C2.92986 6.83365 2.99028 6.99002 3.10059 7.1084L5.18359 9.19238C5.30069 9.30922 5.45959 9.37491 5.625 9.375C5.79061 9.375 5.9502 9.3094 6.06738 9.19238L10.2334 5.02539C10.2948 4.96817 10.3447 4.89893 10.3789 4.82227C10.413 4.74569 10.4311 4.6629 10.4326 4.5791C10.4341 4.49518 10.4182 4.41181 10.3867 4.33398C10.3553 4.25628 10.3092 4.18527 10.25 4.12598C10.1907 4.06668 10.1197 4.01971 10.042 3.98828C9.96427 3.95689 9.88069 3.94192 9.79688 3.94336Z";
+
+// Hex/warning for failed step (viewBox: 0 0 11.666 13.4212)
+const PATH_STEP_FAILED = "M5.3252 0.13833C5.63837 -0.04611 6.02765 -0.04611 6.34082 0.13833L11.1738 2.98501C11.4789 3.16471 11.6659 3.49228 11.666 3.84634V9.57388C11.666 9.92806 11.479 10.2564 11.1738 10.4362L6.34082 13.2829C6.02765 13.4673 5.63837 13.4673 5.3252 13.2829L0.492188 10.4362C0.187003 10.2564 0 9.92806 0 9.57388V3.84634C8.97204e-05 3.49228 0.187106 3.16471 0.492188 2.98501L5.3252 0.13833ZM5.83301 9.00161C5.48797 9.00161 5.20823 9.28162 5.20801 9.62661C5.20801 9.97179 5.48783 10.2516 5.83301 10.2516C6.17819 10.2516 6.45801 9.97179 6.45801 9.62661C6.45779 9.28162 6.17805 9.00161 5.83301 9.00161ZM5.83301 3.37661C5.48797 3.37661 5.20823 3.65662 5.20801 4.00161V7.3356C5.20812 7.68068 5.4879 7.9606 5.83301 7.9606C6.17812 7.9606 6.45789 7.68068 6.45801 7.3356V4.00161C6.45779 3.65662 6.17805 3.37661 5.83301 3.37661Z";
+
+// Caret chevron for expand toggle (viewBox: 0 0 10.4397 5.96941)
+const PATH_CHEVRON = "M9.6904 5.96907C9.88916 5.96907 10.0798 5.89018 10.2204 5.74973C10.3609 5.6091 10.4397 5.41848 10.4397 5.21973C10.4397 5.02098 10.3609 4.83036 10.2204 4.68973L5.75 0.219338C5.60937 0.0788879 5.41875 0 5.22 0C5.02124 0 4.83062 0.0788879 4.69 0.219338L0.238707 4.6707C0.16502 4.73936 0.105918 4.82216 0.0649265 4.91416C0.0239347 5.00616 0.00189341 5.10547 0.000116715 5.20617C-0.00165998 5.30688 0.0168637 5.40691 0.0545849 5.5003C0.092306 5.59368 0.148451 5.67852 0.21967 5.74974C0.290889 5.82095 0.375723 5.8771 0.469111 5.91482C0.562499 5.95254 0.662527 5.97107 0.76323 5.96929C0.863932 5.96751 0.963247 5.94547 1.05525 5.90448C1.14725 5.86349 1.23005 5.80438 1.29871 5.7307L5.22 1.80934L9.1604 5.74973C9.30103 5.89018 9.49165 5.96907 9.6904 5.96907Z";
 
 /* ── Status indicators ──────────────────────────────────────── */
 
@@ -17,14 +28,14 @@ function StepDot({ status }: { status: ToolCallStatus }) {
   if (status === "completed") {
     return (
       <svg className="shrink-0 size-[14px]" viewBox="0 0 13.334 13.334" fill="none">
-        <path d={toolCallSvgPaths.p353d1680} fill="var(--chart-5)" />
+        <path d={PATH_STEP_COMPLETED} fill="var(--chart-5)" />
       </svg>
     );
   }
   if (status === "failed") {
     return (
       <svg className="shrink-0 size-[14px]" viewBox="0 0 11.666 13.4212" fill="none">
-        <path d={toolCallSvgPaths.p31b07cc0} fill="var(--destructive)" />
+        <path d={PATH_STEP_FAILED} fill="var(--destructive)" />
       </svg>
     );
   }
@@ -43,7 +54,7 @@ function StepDot({ status }: { status: ToolCallStatus }) {
   );
 }
 
-// LAYOUT — Small inline chevron (8×5)
+// LAYOUT — Small inline chevron (8×5), animated rotation on expand
 function Chevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -57,7 +68,7 @@ function Chevron({ open }: { open: boolean }) {
         transition: "transform 150ms ease",
       }}
     >
-      <path d={svgPaths.p348f4800} fill="var(--muted-foreground)" />
+      <path d={PATH_CHEVRON} fill="var(--muted-foreground)" />
     </svg>
   );
 }
@@ -75,9 +86,7 @@ function CopyBtn({ text }: { text: string }) {
       onClick={(e) => { e.stopPropagation(); handleCopy(); }}
       aria-label="Copy"
     >
-      <svg className="block size-[11px]" fill="none" viewBox="0 0 13.3333 16.67">
-        <path d={toolCallSvgPaths.p13f9f0f0} fill="var(--secondary-foreground)" />
-      </svg>
+      <IconCopy size={12} style={{ color: "var(--secondary-foreground)" }} />
     </button>
   );
 }
@@ -215,7 +224,6 @@ export function ToolCallsBlock({ toolCalls }: ToolCallsBlockProps) {
   // STATE
   const steps = toolCalls.steps;
   const isRunning = steps.some((s) => s.status === "running");
-  const allDone = steps.every((s) => s.status === "completed" || s.status === "failed");
   const [expanded, setExpanded] = useState(isRunning);
 
   // COPY — Summary text
@@ -239,7 +247,7 @@ export function ToolCallsBlock({ toolCalls }: ToolCallsBlockProps) {
           </div>
         ) : (
           <svg className="shrink-0 size-[12px]" viewBox="0 0 13.334 13.334" fill="none">
-            <path d={toolCallSvgPaths.p353d1680} fill="var(--chart-5)" />
+            <path d={PATH_STEP_COMPLETED} fill="var(--chart-5)" />
           </svg>
         )}
 

@@ -1,18 +1,35 @@
 // COMPONENT — Chat panel with message list, output blocks, and input
+// Portable version: no Figma svgPaths imports — uses icon components from ./icons/
 // Delegates all state to useChat hook; renders block views inline
 
 import { useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useState, useRef, useEffect } from "react";
-import svgPaths from "../../imports/svg-javaskxvh1";
-import approvalSvgPaths from "../../imports/svg-comj3w05wm";
+import { IconMore } from "./icons/IconMore";
+import { IconWarning } from "./icons/IconWarning";
+
+// Inline path data for non-standard viewBox icons used in this panel
+// Source: svg-javaskxvh1.ts, svg-comj3w05wm.ts
+
+// Chevron caret (viewBox: 0 0 10.4397 5.96941) — approval expand toggle
+const PATH_CHEVRON = "M9.6904 5.96907C9.88916 5.96907 10.0798 5.89018 10.2204 5.74973C10.3609 5.6091 10.4397 5.41848 10.4397 5.21973C10.4397 5.02098 10.3609 4.83036 10.2204 4.68973L5.75 0.219338C5.60937 0.0788879 5.41875 0 5.22 0C5.02124 0 4.83062 0.0788879 4.69 0.219338L0.238707 4.6707C0.16502 4.73936 0.105918 4.82216 0.0649265 4.91416C0.0239347 5.00616 0.00189341 5.10547 0.000116715 5.20617C-0.00165998 5.30688 0.0168637 5.40691 0.0545849 5.5003C0.092306 5.59368 0.148451 5.67852 0.21967 5.74974C0.290889 5.82095 0.375723 5.8771 0.469111 5.91482C0.562499 5.95254 0.662527 5.97107 0.76323 5.96929C0.863932 5.96751 0.963247 5.94547 1.05525 5.90448C1.14725 5.86349 1.23005 5.80438 1.29871 5.7307L5.22 1.80934L9.1604 5.74973C9.30103 5.89018 9.49165 5.96907 9.6904 5.96907Z";
+
+// Calendar/datetime composite icon (3 paths, viewBox: 0 0 13.3333 12.6667)
+const PATH_DATE_A = "M4.05556 0.5C4.05556 0.223858 3.8317 0 3.55556 0C3.27941 0 3.05556 0.223858 3.05556 0.5V1.33333H2.16667C0.97005 1.33333 0 2.30338 0 3.5V9.83333C0 11.03 0.970049 12 2.16667 12H6.53971C6.25549 11.7038 6.01293 11.3673 5.82147 11H2.16667C1.52233 11 1 10.4777 1 9.83333V6.5H6.12677C6.39863 6.11576 6.73148 5.77773 7.11121 5.5L1 5.5V3.5C1 2.85567 1.52233 2.33333 2.16667 2.33333H3.05556V3.16667C3.05556 3.44281 3.27941 3.66667 3.55556 3.66667C3.8317 3.66667 4.05556 3.44281 4.05556 3.16667V2.33333H9.27778V3.16667C9.27778 3.44281 9.50163 3.66667 9.77778 3.66667C10.0539 3.66667 10.2778 3.44281 10.2778 3.16667V2.33333H11.1667C11.811 2.33333 12.3333 2.85567 12.3333 3.5V5.5H12.2221C12.6631 5.82254 13.0409 6.22641 13.3333 6.68954V3.5C13.3333 2.30338 12.3633 1.33333 11.1667 1.33333H10.2778V0.5C10.2778 0.223858 10.0539 0 9.77778 0C9.50163 0 9.27778 0.223858 9.27778 0.5V1.33333H4.05556V0.5Z";
+const PATH_DATE_B = "M9.33333 7.16667C9.60947 7.16667 9.83333 7.39052 9.83333 7.66667V8.83333H10.6667C10.9428 8.83333 11.1667 9.05719 11.1667 9.33333C11.1667 9.60948 10.9428 9.83333 10.6667 9.83333H9.33333C9.05719 9.83333 8.83333 9.60948 8.83333 9.33333V7.66667C8.83333 7.39052 9.05719 7.16667 9.33333 7.16667Z";
+const PATH_DATE_C = "M9.66667 12.6667C11.6917 12.6667 13.3333 11.025 13.3333 9C13.3333 6.97496 11.6917 5.33333 9.66667 5.33333C7.64162 5.33333 6 6.97496 6 9C6 11.025 7.64162 12.6667 9.66667 12.6667ZM9.66667 11.6667C11.1394 11.6667 12.3333 10.4728 12.3333 9C12.3333 7.52724 11.1394 6.33333 9.66667 6.33333C8.19391 6.33333 7 7.52724 7 9C7 10.4728 8.19391 11.6667 9.66667 11.6667Z";
+
+// Text/string composite icon (3 paths, viewBox: 0 0 13.3335 6.57256)
+const PATH_TEXT_A = "M5.61111 0.5C5.61111 0.223858 5.38725 0 5.11111 0C4.83497 0 4.61111 0.223858 4.61111 0.5V6.05555C4.61111 6.3317 4.83497 6.55555 5.11111 6.55555C5.35314 6.55555 5.55501 6.38358 5.60119 6.15517C5.94 6.40847 6.344 6.55555 6.77778 6.55555C7.97439 6.55555 8.94444 5.43626 8.94444 4.05555C8.94444 2.67484 7.97439 1.55555 6.77778 1.55555C6.34823 1.55555 5.94788 1.69978 5.61111 1.94856V0.5ZM5.61111 4.05555C5.61111 5.02312 6.263 5.55555 6.77778 5.55555C7.29255 5.55555 7.94444 5.02312 7.94444 4.05555C7.94444 3.08799 7.29255 2.55555 6.77778 2.55555C6.263 2.55555 5.61111 3.08799 5.61111 4.05555Z";
+const PATH_TEXT_B = "M0.944444 3L0.944507 2.99984C0.971448 2.93249 1.01591 2.82133 1.18844 2.72843C1.3668 2.63239 1.64048 2.56944 1.94444 2.56944C2.2484 2.56944 2.52209 2.63239 2.70045 2.72843C2.99567 2.88739 2.93344 3.14122 2.6725 3.3043C2.50681 3.40785 2.25649 3.45676 1.87307 3.51207C1.85028 3.51535 1.82681 3.51868 1.80272 3.52209L1.80247 3.52212C1.48187 3.56752 1.05353 3.62818 0.711078 3.81587C0.510208 3.92597 0.322767 4.08594 0.189927 4.31859C0.0584365 4.54888 0 4.81609 0 5.1111C0 5.65268 0.302855 6.05717 0.692328 6.2931C1.07062 6.52226 1.54468 6.60757 1.99704 6.55972C2.31224 6.52638 2.63617 6.42633 2.92656 6.24631C3.00154 6.42783 3.1803 6.55556 3.38889 6.55556C3.66503 6.55556 3.88889 6.3317 3.88889 6.05556V2.94444C3.88889 2.40624 3.54355 2.04665 3.17455 1.84796C2.81124 1.65233 2.36271 1.56944 1.94444 1.56944C1.52618 1.56944 1.07765 1.65233 0.714339 1.84796C0.345334 2.04665 0 2.40624 0 2.94444C0 3.11111 0.111111 3.33333 0.388889 3.38889C0.666666 3.44444 0.833333 3.27778 0.944444 3ZM2.88889 4.38979V4.30581C2.5919 4.41879 2.27636 4.46427 2.02891 4.49994L2.01582 4.50182C1.61973 4.55895 1.36506 4.59779 1.1917 4.6928C1.12174 4.73115 1.08348 4.77039 1.05834 4.81443C1.03184 4.86084 1 4.94779 1 5.1111C1 5.2362 1.05826 5.3456 1.21045 5.43779C1.37382 5.53676 1.62198 5.59381 1.89185 5.56527C2.1577 5.53715 2.40526 5.43014 2.58226 5.25144C2.75176 5.0803 2.88869 4.81171 2.88889 4.38979Z";
+const PATH_TEXT_C = "M11.4445 1.55555C10.7266 1.55555 10.1757 1.89584 9.82036 2.38781C9.47569 2.86504 9.31944 3.4736 9.31944 4.05555C9.31944 4.63751 9.47569 5.24607 9.82035 5.7233C10.1757 6.21527 10.7266 6.55555 11.4444 6.55555C11.902 6.55555 12.3171 6.45749 12.654 6.2227C12.9967 5.98383 13.2077 5.6389 13.3157 5.24267C13.3884 4.97626 13.2313 4.70139 12.9649 4.62873C12.6985 4.55607 12.4236 4.71314 12.351 4.97955C12.2924 5.19443 12.1978 5.32172 12.0822 5.4023C11.9607 5.48694 11.7646 5.55555 11.4444 5.55555C11.0789 5.55555 10.8174 5.39584 10.631 5.13781C10.434 4.86504 10.3194 4.4736 10.3194 4.05555C10.3194 3.63751 10.434 3.24607 10.631 2.9733C10.8174 2.71527 11.0789 2.55555 11.4445 2.55555C11.7646 2.55555 11.9607 2.62416 12.0822 2.70881C12.1978 2.78939 12.2924 2.91668 12.351 3.13156C12.4236 3.39797 12.6985 3.55504 12.9649 3.48238C13.2313 3.40972 13.3884 3.13485 13.3157 2.86844C13.2077 2.4722 12.9967 2.12728 12.654 1.88841C12.3171 1.65361 11.9021 1.55555 11.4445 1.55555Z";
+
+// AI sparkle icon path (viewBox: 0 0 30 30) — used in chat header with gradient fill
+const PATH_AI_SPARKLE = "M12.059 8.49519C12.657 6.74519 15.075 6.69219 15.784 8.33619L15.844 8.49619L16.651 10.8562C16.8359 11.3974 17.1348 11.8927 17.5274 12.3086C17.92 12.7245 18.3973 13.0514 18.927 13.2672L19.144 13.3482L21.504 14.1542C23.254 14.7522 23.307 17.1702 21.664 17.8792L21.504 17.9392L19.144 18.7462C18.6026 18.931 18.1071 19.2298 17.691 19.6225C17.2749 20.0151 16.9479 20.4924 16.732 21.0222L16.651 21.2382L15.845 23.5992C15.247 25.3492 12.829 25.4022 12.121 23.7592L12.059 23.5992L11.253 21.2392C11.0682 20.6978 10.7694 20.2023 10.3768 19.7862C9.98413 19.3701 9.50681 19.0431 8.97702 18.8272L8.76102 18.7462L6.40102 17.9402C4.65001 17.3422 4.59701 14.9242 6.24102 14.2162L6.40102 14.1542L8.76102 13.3482C9.30225 13.1632 9.79753 12.8644 10.2134 12.4718C10.6293 12.0791 10.9562 11.6019 11.172 11.0722L11.253 10.8562L12.059 8.49519ZM21.952 5.04719C22.1391 5.04719 22.3224 5.09966 22.4811 5.19866C22.6399 5.29765 22.7677 5.43919 22.85 5.60719L22.898 5.72419L23.248 6.75019L24.275 7.10019C24.4625 7.16389 24.6268 7.28181 24.7472 7.43901C24.8676 7.59621 24.9386 7.78561 24.9513 7.98321C24.9639 8.18081 24.9176 8.37772 24.8182 8.54898C24.7188 8.72023 24.5708 8.85813 24.393 8.94519L24.275 8.99319L23.249 9.34319L22.899 10.3702C22.8352 10.5576 22.7172 10.7219 22.5599 10.8422C22.4026 10.9625 22.2132 11.0334 22.0156 11.0459C21.818 11.0584 21.6212 11.012 21.45 10.9126C21.2788 10.8131 21.141 10.6651 21.054 10.4872L21.006 10.3702L20.656 9.34419L19.629 8.99419C19.4415 8.93049 19.2771 8.81257 19.1567 8.65538C19.0364 8.49818 18.9653 8.30877 18.9527 8.11117C18.9401 7.91357 18.9864 7.71666 19.0858 7.5454C19.1851 7.37415 19.3331 7.23625 19.511 7.14919L19.629 7.10119L20.655 6.75119L21.005 5.72419C21.0724 5.52661 21.2 5.35509 21.3698 5.23368C21.5396 5.11227 21.7432 5.04706 21.952 5.04719Z";
 
 // STATE — Hook + types
 import { useChat } from "../hooks/useChat";
 import type { OutputBlock, BlockType, ApprovalData, WikiReviewData, CatalogActions } from "../hooks/useChat";
-
-// ICONS
-import { IconEntityView } from "./icons/IconEntityView";
 
 // LAYOUT — Shared input component
 import { ChatInput } from "./ChatInput";
@@ -159,11 +176,7 @@ function MoreMenuButton({ items, onItemClick }: { items: string[]; onItemClick?:
         onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
       >
         <div aria-hidden="true" className="absolute border border-border border-solid inset-0 pointer-events-none rounded-[var(--radius-button)]" />
-        <svg width="10" height="3" viewBox="0 0 10.3333 2.33333" fill="none">
-          <path d={svgPaths.p12e12a80} fill="var(--secondary-foreground)" />
-          <path d={svgPaths.p39c2dc00} fill="var(--secondary-foreground)" />
-          <path d={svgPaths.p1a349680} fill="var(--secondary-foreground)" />
-        </svg>
+        <IconMore size={16} style={{ color: "var(--secondary-foreground)" }} />
       </div>
       {open && menuPos && createPortal(
         <div ref={ref} className="fixed z-50 bg-popover overflow-clip py-[4px] rounded-[var(--radius-button)] shadow-dropdown min-w-[8rem]" style={{ top: menuPos.top, left: menuPos.left, transform: "translateY(-100%)" }}>
@@ -201,10 +214,8 @@ function MoreMenuButton({ items, onItemClick }: { items: string[]; onItemClick?:
 function ApprovalBadge() {
   return (
     <div className="bg-destructive/10 flex h-[20px] items-center justify-center px-[6px] py-px rounded-[var(--radius-button)] shrink-0 gap-[4px]">
-      <div className="relative shrink-0 size-[12px]">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-          <path d={approvalSvgPaths.p3d0c7e00} fill="var(--destructive)" />
-        </svg>
+      <div className="shrink-0 size-[12px] flex items-center justify-center">
+        <IconWarning size={12} style={{ color: "var(--destructive)" }} />
       </div>
       <p
         className="text-destructive tracking-[0.3px] uppercase whitespace-nowrap"
@@ -302,7 +313,7 @@ function ApprovalBlockView({ approval, onExecute, onRequestChanges }: {
                       <p className="text-foreground flex-1 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontFamily: "var(--font-mono, 'Fira Code', monospace)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-normal)", lineHeight: "1.5" }}>{approval.sql.split("\n")[0]}</p>
                       <button type="button" className="shrink-0 size-[20px] cursor-pointer flex items-center justify-center hover:opacity-70 transition-opacity" onClick={() => setExpanded(!expanded)}>
                         <svg width="10" height="6" viewBox="0 0 10.4397 5.96941" fill="none" style={{ transform: expanded ? "none" : "rotate(180deg)", transition: "transform 150ms ease" }}>
-                          <path d={approvalSvgPaths.p348f4800} fill="var(--secondary-foreground)" />
+                          <path d={PATH_CHEVRON} fill="var(--secondary-foreground)" />
                         </svg>
                       </button>
                     </div>
@@ -509,11 +520,11 @@ function TableBlockView({ block, onBlockClick, onBlockHover, hoveredBlock }: { b
             <div aria-hidden="true" className="absolute border-muted border-b border-l border-solid border-t inset-0 pointer-events-none" />
             <div className="flex items-center h-[32px]">
               <div className="flex-1 flex items-center gap-[8px] px-[8px]">
-                <div className="relative shrink-0 size-[16px]"><div className="absolute inset-[12.5%_8.33%_8.33%_8.33%]"><svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 13.3333 12.6667"><g><path d={svgPaths.p12a67780} fill="var(--secondary-foreground)" /><path d={svgPaths.p20aeb800} fill="var(--secondary-foreground)" /><path clipRule="evenodd" d={svgPaths.p2eceac40} fill="var(--secondary-foreground)" fillRule="evenodd" /></g></svg></div></div>
+                <div className="relative shrink-0 size-[16px]"><div className="absolute inset-[12.5%_8.33%_8.33%_8.33%]"><svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 13.3333 12.6667"><g><path d={PATH_DATE_A} fill="var(--secondary-foreground)" /><path d={PATH_DATE_B} fill="var(--secondary-foreground)" /><path clipRule="evenodd" d={PATH_DATE_C} fill="var(--secondary-foreground)" fillRule="evenodd" /></g></svg></div></div>
                 <p className="text-foreground overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>Pickup_datetime</p>
               </div>
               <div className="flex-1 flex items-center gap-[8px] px-[8px] border-l border-muted">
-                <div className="relative shrink-0 size-[16px]"><div className="absolute inset-[29.17%_8.33%_29.75%_8.33%]"><svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 13.3335 6.57256"><g><path clipRule="evenodd" d={svgPaths.p252b4f00} fill="var(--secondary-foreground)" fillRule="evenodd" /><path clipRule="evenodd" d={svgPaths.p2f751880} fill="var(--secondary-foreground)" fillRule="evenodd" /><path d={svgPaths.p2f226800} fill="var(--secondary-foreground)" /></g></svg></div></div>
+                <div className="relative shrink-0 size-[16px]"><div className="absolute inset-[29.17%_8.33%_29.75%_8.33%]"><svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 13.3335 6.57256"><g><path clipRule="evenodd" d={PATH_TEXT_A} fill="var(--secondary-foreground)" fillRule="evenodd" /><path clipRule="evenodd" d={PATH_TEXT_B} fill="var(--secondary-foreground)" fillRule="evenodd" /><path d={PATH_TEXT_C} fill="var(--secondary-foreground)" /></g></svg></div></div>
                 <p className="text-foreground" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>ID</p>
               </div>
               <div className="w-[80px] flex items-center gap-[8px] px-[8px] border-l border-muted overflow-hidden">
@@ -672,7 +683,12 @@ function ViewBlockView({ block, onBlockClick, onBlockHover, hoveredBlock }: {
             <div className="flex items-center px-[16px] py-[8px] size-full gap-[8px] overflow-hidden">
               <BlockTypeBadge type="view" />
               <div className="shrink-0 size-[20px] flex items-center justify-center">
-                <IconEntityView size={20} />
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <rect x="1" y="1" width="12" height="12" rx="2" stroke="var(--accent)" strokeWidth="1.2" />
+                  <line x1="1" y1="5" x2="13" y2="5" stroke="var(--accent)" strokeWidth="1.2" />
+                  <line x1="5" y1="5" x2="5" y2="13" stroke="var(--accent)" strokeWidth="1.2" />
+                  <line x1="9" y1="5" x2="9" y2="13" stroke="var(--accent)" strokeWidth="1.2" />
+                </svg>
               </div>
               <p className="text-secondary-foreground whitespace-nowrap overflow-hidden text-ellipsis flex-1" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>{block.title}</p>
               {d && <p className="text-secondary-foreground whitespace-nowrap shrink-0" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-normal)", lineHeight: "1.5" }}>{d.columnCount} cols</p>}
@@ -742,7 +758,7 @@ export function ChatPanel({ onBlockClick, onBlockHover, hoveredBlock, onSaveAsVi
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0">
             <div className="relative shrink-0 size-[30px]">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 30 30">
-                <path d={svgPaths.p2962b000} fill="url(#paint0_linear_chat_hdr)" />
+                <path d={PATH_AI_SPARKLE} fill="url(#paint0_linear_chat_hdr)" />
                 <defs>
                   <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_chat_hdr" x1="4.14179" x2="27.1147" y1="9.21348" y2="25.3789">
                     <stop stopColor="#299FB1" /><stop offset="0.55" stopColor="#4FC08B" /><stop offset="1" stopColor="#B7D325" />
