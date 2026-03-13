@@ -19,6 +19,12 @@ This design system repo contains the **actual source code** for every component 
 4. **Copy `styles/theme.css`** into your project's `src/styles/` and import it
 5. **Copy the hooks** from `hooks/` — do not re-implement state management
 
+### ⛔ Two failure modes that produce a broken LeftNav
+
+**Failure 1 — Missing `theme.css`:** If `styles/theme.css` is not imported, all CSS variables resolve to nothing. `LeftNav` background becomes white (should be `#2A394A` dark navy), icon/text colors disappear. **Fix:** copy `styles/theme.css` and import it at the top of your app entry point.
+
+**Failure 2 — Wrong icons:** `LeftNav` uses `IconDremioLogo`, `IconNavHome`, `IconAiAgent`, `IconNavCatalog`, `IconNavSqlRunner`, `IconNavSemanticLayer`, `IconNavSettings`, `IconNavHelp`, `IconNavExpandMenu` — all from `components/icons/`. If you substitute Fluent UI, Heroicons, or any other icon library the nav will look completely wrong. **Fix:** copy the entire `components/icons/` directory into your project.
+
 ### What already exists (copy, don't rebuild)
 
 | Need | File to copy |

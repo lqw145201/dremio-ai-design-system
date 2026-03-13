@@ -7,6 +7,23 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · LeftNav + CLAUDE.md — Add hex fallbacks and failure mode docs
+
+**What changed:**
+
+`components/LeftNav.tsx`:
+- Background: `var(--sidebar)` → `var(--sidebar, #2A394A)` — hex fallback so nav renders dark navy even when `theme.css` is not yet imported
+- `IconWrapper` color: `var(--accent)` / `var(--sidebar-foreground)` → added `#008489` / `#ffffff` fallbacks
+- Label text color: same fallbacks added
+- Bottom section icon spans: same fallbacks added
+
+`CLAUDE.md`:
+- Added **"Two failure modes that produce a broken LeftNav"** section immediately after the component workflow, documenting exactly what goes wrong when `theme.css` is missing or wrong icons are used, and how to fix each.
+
+**Why:** AI-built implementations kept producing a white-background LeftNav with wrong icons (narwhal logo, generic icon set). Root causes: (1) `theme.css` not imported so CSS vars resolve to nothing; (2) icon components not copied, so generic fallbacks used. Hex fallbacks prevent silent white-nav failure; CLAUDE.md addition prevents icon substitution.
+
+---
+
 ## 2026-03-13 · Design Systems · LeftNav — Fix icon color/opacity not applying
 
 **What changed:** `components/LeftNav.tsx` — replaced `iconStyle()` helper (which passed a `style` prop directly to icon components) with an `IconWrapper` span that applies `color` and `opacity` via CSS inheritance.

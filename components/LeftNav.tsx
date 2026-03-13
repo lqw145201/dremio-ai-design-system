@@ -52,7 +52,7 @@ function NavItem({ icon, label, active, hasBackground, bgColor }: NavItemProps) 
         style={{
           fontFeatureSettings: "'cv08', 'lnum', 'tnum'",
           fontWeight: active ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
-          color: active ? "var(--accent)" : "var(--sidebar-foreground)",
+          color: active ? "var(--accent, #008489)" : "var(--sidebar-foreground, #ffffff)",
           lineHeight: "14px",
           opacity: active ? 1 : 0.7,
         }}
@@ -82,7 +82,7 @@ function IconWrapper({ active, children }: { active: boolean; children: React.Re
     <span
       style={{
         display: "flex",
-        color: active ? "var(--accent)" : "var(--sidebar-foreground)",
+        color: active ? "var(--accent, #008489)" : "var(--sidebar-foreground, #ffffff)",
         opacity: active ? 1 : 0.7,
       }}
     >
@@ -92,14 +92,16 @@ function IconWrapper({ active, children }: { active: boolean; children: React.Re
 }
 
 // LAYOUT — Main nav container
-// ⚠️ Background MUST be var(--sidebar) (#2A394A dark navy), NOT var(--background).
+// ⚠️ Background MUST be #2A394A dark navy. Hex fallback is intentional —
+//    if theme.css is not imported, var(--sidebar) resolves to nothing and the
+//    nav renders white. Never remove the fallback.
 export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNavigate }: LeftNavProps = {}) {
   const isActive = (item: LeftNavItem) => activeItem === item;
 
   return (
     <div
       className="flex flex-col items-center justify-between shrink-0 w-[64px] h-full"
-      style={{ background: "var(--sidebar)" }}
+      style={{ background: "var(--sidebar, #2A394A)" }}
     >
       {/* Top section: logo + nav items */}
       <div className="flex flex-col gap-[8px] items-center shrink-0 w-full">
@@ -173,7 +175,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
         {/* Help */}
         <div className="flex items-center justify-center p-[4px] cursor-pointer">
           <div className="flex items-center justify-center shrink-0 size-[24px]">
-            <span style={{ display: "flex", color: "var(--sidebar-foreground)", opacity: 0.7 }}>
+            <span style={{ display: "flex", color: "var(--sidebar-foreground, #ffffff)", opacity: 0.7 }}>
               <IconNavHelp size={20} />
             </span>
           </div>
@@ -185,7 +187,7 @@ export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNaviga
         {/* Expand/collapse nav */}
         <div className="flex items-center justify-center p-[4px] cursor-pointer">
           <div className="flex items-center justify-center shrink-0 size-[24px]">
-            <span style={{ display: "flex", color: "var(--sidebar-foreground)", opacity: 0.7 }}>
+            <span style={{ display: "flex", color: "var(--sidebar-foreground, #ffffff)", opacity: 0.7 }}>
               <IconNavExpandMenu size={20} />
             </span>
           </div>
