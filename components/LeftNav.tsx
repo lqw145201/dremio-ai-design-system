@@ -63,9 +63,27 @@ function NavItem({ icon, label, active, hasBackground, bgColor }: NavItemProps) 
   );
 }
 
+// LAYOUT — LeftNav props
+export type LeftNavItem = "home" | "ai-agent" | "catalog" | "sql" | "semantic-layer" | "admin";
+
+interface LeftNavProps {
+  /** Which nav item is currently active. Defaults to "ai-agent". */
+  activeItem?: LeftNavItem;
+  /** User initials shown in the avatar at the bottom. Defaults to "TS". */
+  userInitials?: string;
+  /** Called when a nav item is clicked, with its item key. */
+  onNavigate?: (item: LeftNavItem) => void;
+}
+
 // LAYOUT — Main nav container
 // ⚠️ Background MUST be var(--sidebar) (#2A394A dark navy), NOT var(--background).
-export function LeftNav() {
+export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNavigate }: LeftNavProps = {}) {
+  const isActive = (item: LeftNavItem) => activeItem === item;
+  const iconColor = (item: LeftNavItem) =>
+    isActive(item) ? "var(--accent)" : "var(--sidebar-foreground)";
+  const iconStyle = (item: LeftNavItem): React.CSSProperties =>
+    isActive(item) ? { color: "var(--accent)" } : { color: "var(--sidebar-foreground)", opacity: 0.7 };
+
   return (
     <div
       className="flex flex-col items-center justify-between shrink-0 w-[64px] h-full"
@@ -76,38 +94,65 @@ export function LeftNav() {
         <Logo />
         <div className="flex flex-col gap-[16px] items-center w-full px-[4px]">
           {/* Home */}
-          <NavItem
-            label="Home"
-            icon={<IconNavHome size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />}
-          />
-          {/* AI Agent — active state */}
-          <NavItem
-            label="AI Agent"
-            active
-            hasBackground
-            bgColor="rgba(33, 132, 128, 0.2)"
-            icon={<IconAiAgent size={20} style={{ color: "var(--accent)" }} />}
-          />
+          <div onClick={() => onNavigate?.("home")} className="w-full">
+            <NavItem
+              label="Home"
+              active={isActive("home")}
+              hasBackground={isActive("home")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconNavHome size={20} style={iconStyle("home")} />}
+            />
+          </div>
+          {/* AI Agent */}
+          <div onClick={() => onNavigate?.("ai-agent")} className="w-full">
+            <NavItem
+              label="AI Agent"
+              active={isActive("ai-agent")}
+              hasBackground={isActive("ai-agent")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconAiAgent size={20} style={iconStyle("ai-agent")} />}
+            />
+          </div>
           {/* Catalog */}
-          <NavItem
-            label="Catalog"
-            icon={<IconNavCatalog size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />}
-          />
+          <div onClick={() => onNavigate?.("catalog")} className="w-full">
+            <NavItem
+              label="Catalog"
+              active={isActive("catalog")}
+              hasBackground={isActive("catalog")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconNavCatalog size={20} style={iconStyle("catalog")} />}
+            />
+          </div>
           {/* SQL Runner */}
-          <NavItem
-            label="SQL"
-            icon={<IconNavSqlRunner size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />}
-          />
+          <div onClick={() => onNavigate?.("sql")} className="w-full">
+            <NavItem
+              label="SQL"
+              active={isActive("sql")}
+              hasBackground={isActive("sql")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconNavSqlRunner size={20} style={iconStyle("sql")} />}
+            />
+          </div>
           {/* Semantic Layer */}
-          <NavItem
-            label="Semantic Layer"
-            icon={<IconNavSemanticLayer size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />}
-          />
+          <div onClick={() => onNavigate?.("semantic-layer")} className="w-full">
+            <NavItem
+              label="Semantic Layer"
+              active={isActive("semantic-layer")}
+              hasBackground={isActive("semantic-layer")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconNavSemanticLayer size={20} style={iconStyle("semantic-layer")} />}
+            />
+          </div>
           {/* Admin */}
-          <NavItem
-            label="Admin"
-            icon={<IconNavSettings size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />}
-          />
+          <div onClick={() => onNavigate?.("admin")} className="w-full">
+            <NavItem
+              label="Admin"
+              active={isActive("admin")}
+              hasBackground={isActive("admin")}
+              bgColor="rgba(33, 132, 128, 0.2)"
+              icon={<IconNavSettings size={20} style={iconStyle("admin")} />}
+            />
+          </div>
         </div>
       </div>
 
@@ -119,9 +164,9 @@ export function LeftNav() {
             <IconNavHelp size={20} style={{ color: "var(--sidebar-foreground)", opacity: 0.7 }} />
           </div>
         </div>
-        {/* Avatar — initials circle */}
+        {/* Avatar — initials from prop */}
         <div className="flex items-center justify-center p-[4px]">
-          <UserAvatar initials="TS" size={24} />
+          <UserAvatar initials={userInitials} size={24} />
         </div>
         {/* Expand/collapse nav */}
         <div className="flex items-center justify-center p-[4px] cursor-pointer">

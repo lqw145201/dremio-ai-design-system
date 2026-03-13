@@ -75,7 +75,7 @@ For every component identified in Step 1, call `get_design_context` on it direct
 
 ### Step 3 — Implement using project tokens, not Figma raw values
 
-Map Figma fill/stroke values back to `src/styles/theme.css` tokens. Never hardcode hex.
+Map Figma fill/stroke values back to `styles/theme.css` tokens. Never hardcode hex.
 
 ### Step 4 — Validate against screenshot
 
@@ -153,6 +153,24 @@ Weights: 600 semibold (headings, active items), 400 regular (body).
 
 ---
 
+## LeftNav Props
+
+`LeftNav` is fully controlled via props — do not rebuild it for a different active state.
+
+```tsx
+type LeftNavItem = "home" | "ai-agent" | "catalog" | "sql" | "semantic-layer" | "admin";
+
+<LeftNav
+  activeItem="catalog"        // which item shows as active — defaults to "ai-agent"
+  userInitials="JD"           // avatar initials at the bottom — defaults to "TS"
+  onNavigate={(item) => {}}   // called when any nav item is clicked
+/>
+```
+
+All items use `rgba(33,132,128,0.2)` background + `--accent` icon/text when active. All other items are at 70% opacity with `--sidebar-foreground` color.
+
+---
+
 ## Page Layout — AI Agent
 
 ```
@@ -175,7 +193,7 @@ h-screen w-screen flex
 
 ## Buttons
 
-Use `<Button>` from `src/app/components/ui/button.tsx` — never hand-build `<button>` for primary/secondary actions.
+Use `<Button>` from `components/ui/button.tsx` — never hand-build `<button>` for primary/secondary actions.
 
 | Variant | cva key | Default bg | Hover bg | Text |
 |---|---|---|---|---|
@@ -207,8 +225,8 @@ Use `<Button>` from `src/app/components/ui/button.tsx` — never hand-build `<bu
 
 Always resolve icons in this order — stop at the first match:
 
-1. **`src/app/components/icons/`** — 101 Dremio icons as React `.tsx` components. Check here first, always.
-2. **`public/icons/`** — 113 standalone SVG assets (all icons combined in a single folder). Use as `<img src>` or in design tools when a React component is not needed.
+1. **`components/icons/`** — 101 Dremio icons as React `.tsx` components. Check here first, always.
+2. **`public/icons/`** — 113 standalone SVG assets. Use as `<img src>` or in design tools when a React component is not needed.
 3. **`@fluentui/react-icons` Regular weight** — fallback only when no match exists in steps 1 or 2.
 
 **Never install a new icon package.** If a Fluent icon is used, import only the specific named export — do not add icon libraries.
@@ -386,7 +404,7 @@ Renders when WorkspacePanel or CatalogPanel is collapsed. Provides vertical icon
 7. Icon sizes: 24px (nav/header), 20px (table rows), 16px (button inline), 12px (badge icons)
 8. cva hover colors: edit `button.tsx` directly — never override via `className`
 9. Always `get_design_context` before building any component — never approximate from memory
-10. All icons in `src/app/components/icons/` — check before anything else
+10. All icons in `components/icons/` — check before anything else
 11. Read the full page node first, then each child component. Never code until hierarchy is mapped.
 12. Never place UI elements by intuition — verify every element's parent component in Figma
 13. Never use UI design tokens for code syntax colors. Use code-editor palette: keywords `#0033B3`, strings `#067D17`, functions `#7A3E9D`

@@ -7,6 +7,26 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-13 · Design Systems · LeftNav + CLAUDE.md — Fix hardcoded active state and stale paths
+
+**What changed:**
+
+`components/LeftNav.tsx`:
+- Added `LeftNavItem` type union and `LeftNavProps` interface (`activeItem`, `userInitials`, `onNavigate`)
+- `LeftNav` now accepts all three props with defaults (`activeItem="ai-agent"`, `userInitials="TS"`)
+- Every nav item wrapped in a click handler calling `onNavigate?.(item)`
+- Active state driven by `activeItem` prop — no longer hardcoded to "AI Agent"
+- `UserAvatar` initials now uses the `userInitials` prop
+
+`CLAUDE.md`:
+- Fixed 3 stale `src/app/` path references → `components/icons/`, `components/ui/button.tsx`, `styles/theme.css`
+- Fixed critical rule #10: `src/app/components/icons/` → `components/icons/`
+- Added **LeftNav Props** section with usage example
+
+**Why:** AI systems were rebuilding LeftNav from scratch because (a) the component had no props and appeared frozen at "AI Agent" active state, and (b) CLAUDE.md referenced `src/app/` paths that don't exist in this repo, causing confusion about where icons and primitives live.
+
+---
+
 ## 2026-03-13 · Design Systems · design-system.html — Add missing Context section to §10 Workspace Panel
 
 **What changed:** §10 Workspace Panel was missing documentation for `ContextSection` and `RightSectionHeader`. Expanded §10 with full specs for all three sub-sections and the shared header:
