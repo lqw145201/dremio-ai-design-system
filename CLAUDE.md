@@ -1,16 +1,57 @@
 # Dremio AI Agent – Design System Rules for Claude Code
 
+## ⚠️ STOP — Read This Before Writing Any Code
+
+This design system repo contains the **actual source code** for every component in the Dremio AI Agent prototype. Do not approximate. Do not rebuild. Copy the files.
+
+**Full component catalog → [`COMPONENTS.md`](./COMPONENTS.md)**
+
+### Component Discovery Workflow (required before every task)
+
+1. **Open `COMPONENTS.md`** — find the component you need
+2. **Copy the source file** from `components/` into your project
+3. **Import using the barrel export:**
+   ```tsx
+   import { LeftNav, TopNav, ChatPanel } from './components';
+   import { Button, Badge } from './components/ui';
+   import { IconSearch, IconPlus } from './components/icons';
+   ```
+4. **Copy `styles/theme.css`** into your project's `src/styles/` and import it
+5. **Copy the hooks** from `hooks/` — do not re-implement state management
+
+### What already exists (copy, don't rebuild)
+
+| Need | File to copy |
+|---|---|
+| Left sidebar | `components/LeftNav.tsx` |
+| Top bar | `components/TopNav.tsx` |
+| Chat thread | `components/ChatPanel.tsx` |
+| Chat history list | `components/ChatListPanel.tsx` |
+| Plan/Outputs/Context panel | `components/WorkspacePanel.tsx` |
+| Data catalog tree | `components/CatalogPanel.tsx` |
+| Collapsed panel strip | `components/CollapsedPanelStrip.tsx` |
+| Tool calls block | `components/ToolCallsBlock.tsx` |
+| Any icon | `components/icons/Icon*.tsx` (101 icons — see list in `COMPONENTS.md`) |
+| Button, Badge, Tabs, Dialog… | `components/ui/*.tsx` (48 primitives) |
+| CSS design tokens | `styles/theme.css` |
+| Chat state | `hooks/useChat.ts` |
+| Panel open/close state | `hooks/usePanelLayout.ts` |
+| Workspace block state | `hooks/useWorkspace.ts` |
+
+**If you write an inline `<svg>`, hand-build a `<button>`, or redefine a hook — you are doing it wrong. Check this table first.**
+
+---
+
 ## Project Stack & Component Locations
 
 - **Framework:** React + Vite + TypeScript + Tailwind CSS v4
-- **Theme file:** `src/styles/theme.css` — all CSS custom properties defined here, mapped via `@theme inline`
-- **Icons (106 Dremio icons):** `src/app/components/icons/` — always check here first; never install new icon packages
-- **UI primitives:** `src/app/components/ui/` (Button, Table, Badge, etc.)
-- **Pages:** `src/app/pages/` | **Components:** `src/app/components/`
-- **Hooks:** `src/app/hooks/` (useChat, usePanelLayout, useWorkspace)
-- **Constants:** `src/app/constants/strings.ts`
+- **Theme file:** `src/styles/theme.css` — copy from `styles/theme.css` in this repo
+- **Icons (101 Dremio icons):** `components/icons/` — check here first, never hand-draw SVGs
+- **UI primitives:** `components/ui/` (Button, Tabs, Badge, Dialog, Table, etc.)
+- **Layout components:** `components/` (LeftNav, TopNav, ChatPanel, etc.)
+- **Hooks:** `hooks/` (useChat, usePanelLayout, useWorkspace)
 
-**Never hardcode hex values.** All colors must reference CSS tokens from `src/styles/theme.css`.
+**Never hardcode hex values.** All colors must reference CSS tokens.
 
 ---
 
