@@ -1,8 +1,8 @@
 // COMPONENT — Left navigation sidebar
-// Portable version: no Figma svgPaths imports — uses icon components from ./icons/
-// Background: var(--background) (#F6F7F8 light gray) — matches mona_test_aiagent reference
-// Nav items: icon + label text. Active item: accent color + 10% tinted bg.
-// Inactive items: --secondary-foreground color, no opacity reduction.
+// Uses icon components from ./icons/ — do not substitute other icon libraries.
+// Background: var(--background, #F6F7F8).
+// Nav items: icon + label. Active: --accent color + 10% tinted bg, semibold label.
+// Inactive: --secondary-foreground color, no opacity reduction.
 
 import { IconDremioLogo } from "./icons/IconDremioLogo";
 import { UserAvatar } from "./UserAvatar";

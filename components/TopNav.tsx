@@ -1,6 +1,10 @@
 // COMPONENT — Top navigation bar
-// Portable version: no Figma svgPaths imports — uses icon components from ./icons/
+// Uses icon components from ./icons/ — do not substitute other icon libraries.
 // Contains: project context dropdown (left) + global search bar (center)
+// Height: 48px. Background: var(--card) white. Bottom border: 1px solid var(--muted).
+//
+// ⚠️ Icon components only accept size/className — NOT style.
+// Wrap icons in a <span> with color so fill="currentColor" inherits correctly.
 
 import { IconCaretDown } from "./icons/IconCaretDown";
 import { IconSearch } from "./icons/IconSearch";
@@ -27,7 +31,9 @@ export function ProjectDropdown({ projectName = "First Lakehouse" }: ProjectDrop
       >
         {projectName}
       </p>
-      <IconCaretDown size={16} style={{ color: "var(--secondary-foreground)", flexShrink: 0 }} />
+      <span style={{ display: "flex", flexShrink: 0, color: "var(--secondary-foreground, #505862)" }}>
+        <IconCaretDown size={16} />
+      </span>
     </div>
   );
 }
@@ -48,7 +54,9 @@ export function SearchBar({ placeholder = "Search data, scripts, recent jobs and
         className="absolute border border-solid inset-0 pointer-events-none rounded-[4px]"
         style={{ borderColor: "var(--border)" }}
       />
-      <IconSearch size={16} style={{ color: "var(--secondary-foreground)", flexShrink: 0 }} />
+      <span style={{ display: "flex", flexShrink: 0, color: "var(--secondary-foreground, #505862)" }}>
+        <IconSearch size={16} />
+      </span>
       <p
         className="flex-1 font-['Inter',sans-serif] font-normal leading-[150%] text-[14px]"
         style={{ color: "var(--muted-foreground)" }}

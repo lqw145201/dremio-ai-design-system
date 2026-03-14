@@ -1,7 +1,6 @@
 import React from 'react';
 
-// ICON — Dremio logo mark (actual brand mark)
-// SVG paths sourced from Figma export (mona_test_aiagent reference).
+// ICON — Dremio logo mark
 // Uses fixed brand colors — not currentColor.
 // Size controls both width and height.
 
