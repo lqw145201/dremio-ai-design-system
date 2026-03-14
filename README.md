@@ -51,9 +51,6 @@ Use this repo to look up exact specs when writing tickets or reviewing designs �
 
 3. **Reference token names in tickets** — instead of writing "the teal button", write `<Button variant="default">` or reference the `--primary` token (`#43B8C9`). This removes ambiguity for engineers.
 
-4. **Check the Figma file** for any component not covered here:
-   `https://www.figma.com/design/P2EhSAF4LQfhYQEIiyltan/`
-
 ---
 
 ## For Engineers
@@ -153,21 +150,15 @@ Give Claude the visual context:
 
 > *"I want to add a new panel that looks like the WorkspacePanel in the design system. It should have a tab bar at the top and a scrollable body."*
 
-**3. Let Claude read Figma before writing any code**
-
-Claude will call `get_design_context` on the relevant Figma node before writing a single line. If it skips this step, prompt it:
-
-> *"Read the Figma node for this component before implementing it."*
-
-**4. Reference components by their exact names**
+**3. Reference components by their exact names**
 
 > *"Add a `BlockTypeBadge` with type `sql` to the output block header."*
 > *"Use `<Button variant="ghost">` for this action."*
 > *"The active nav item should use `activeItem="catalog"`."*
 
-**5. Verify the output**
+**4. Verify the output**
 
-Ask Claude to take a screenshot of the Figma node and compare it against what was built before marking a task complete.
+Ask Claude to compare the rendered result against `design-system.html` before marking a task complete.
 
 ---
 
@@ -232,23 +223,6 @@ dremio-ai-design-system/
 | `--destructive` | `#CA3F32` | Delete actions, errors |
 
 Full token reference → [`guidelines/02-Design-Tokens.md`](guidelines/02-Design-Tokens.md)
-
----
-
-## Figma File
-
-All components are spec'd against this file:
-
-`https://www.figma.com/design/P2EhSAF4LQfhYQEIiyltan/`
-
-| Reference | Figma Node |
-|---|---|
-| AI Agent page | `12400:79817` |
-| Nav / Top Nav | `12337:132404` |
-| Secondary nav module | `35:1429` |
-| Secondary nav full | `36:2383` |
-| Settings sample page | `12400:83714` |
-| SQL Runner sample page | `7978:139494` |
 
 ---
 
