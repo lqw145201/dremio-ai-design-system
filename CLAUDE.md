@@ -268,8 +268,10 @@ Type → label mapping:
 | `table` | TABLE |
 | `chart` | CHART |
 | `explanation` | TEXT |
-| `dataset` | TABLE |
+| `dataset` | DATASET |
 | `view` | VIEW |
+| `wiki` | WIKI |
+| `lineage` | LINEAGE |
 
 No accent-colored variant. All types use `--secondary-foreground` text and `--border` border.
 

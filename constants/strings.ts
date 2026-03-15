@@ -67,6 +67,8 @@ export const BLOCK_TYPE_LABELS: Record<string, string> = {
   explanation: "TEXT",
   dataset: "DATASET",
   view: "VIEW",
+  wiki: "WIKI",
+  lineage: "LINEAGE",
 };
 
 export const BLOCK_TYPE_LABELS_WORKSPACE: Record<string, string> = {
@@ -76,6 +78,8 @@ export const BLOCK_TYPE_LABELS_WORKSPACE: Record<string, string> = {
   explanation: "TEXT",
   dataset: "DATASET",
   view: "VIEW",
+  wiki: "WIKI",
+  lineage: "LINEAGE",
 };
 
 // WORKSPACE

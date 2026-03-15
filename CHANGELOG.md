@@ -7,6 +7,22 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-14 · Claude · Badges — Add wiki/lineage types, unify all badge colors
+
+**What changed:**
+- `hooks/useChat.ts`: Added `lineage` and `wiki` to the `BlockType` union type.
+- `constants/strings.ts`: Added `wiki: "WIKI"` and `lineage: "LINEAGE"` to `BLOCK_TYPE_LABELS` and `BLOCK_TYPE_LABELS_WORKSPACE`.
+- `components/ChatPanel.tsx`:
+  - `BlockTypeBadge` `colors` record: added `wiki` and `lineage` (both `text-secondary-foreground`); changed `dataset` and `view` from `text-accent` to `text-secondary-foreground` so all badge types share identical styling.
+  - Replaced the inline wiki badge (custom `bg-fyi/10` pill with sun SVG icon) with `<BlockTypeBadge type="wiki" />`.
+  - `ChartBlockView`: badge now renders `<BlockTypeBadge type={isLineage ? "lineage" : "chart"} />` — lineage blocks previously showed "CHART" / "VIS" incorrectly.
+- `CLAUDE.md`: Updated BlockTypeBadge type table to add `wiki` and `lineage`; corrected `dataset` label to "DATASET".
+- `design-system.html`: Updated §5 BlockTypeBadge table and live preview to include `wiki` and `lineage` rows; corrected `dataset` preview label from "TABLE" to "DATASET".
+
+**Why:** The wiki block badge used a completely different visual style (blue `--fyi` tint, sun icon) compared to every other block type badge. The lineage block reused `type="chart"` which displayed "CHART"/"VIS" instead of "LINEAGE". The user requested all block type badges share the same background and border — only `ApprovalBadge` (action required) uses a distinct destructive color.
+
+---
+
 ## 2026-03-14 · Claude · CatalogPanel — remove inline Toast duplicate
 
 **What changed:** Deleted the inline `function Toast(...)` from `CatalogPanel.tsx` and replaced with `useToast()` from the shared `components/Toast.tsx`. Manual `[toastMsg, setToastMsg]` state and `showToast` callback replaced by the hook. Render site changed from `{toastMsg && <Toast .../>}` to `<ToastOutlet />`.

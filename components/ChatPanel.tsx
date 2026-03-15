@@ -70,8 +70,10 @@ function BlockTypeBadge({ type }: { type: BlockType }) {
     table: "text-secondary-foreground",
     chart: "text-secondary-foreground",
     explanation: "text-secondary-foreground",
-    dataset: "text-accent",
-    view: "text-accent",
+    dataset: "text-secondary-foreground",
+    view: "text-secondary-foreground",
+    wiki: "text-secondary-foreground",
+    lineage: "text-secondary-foreground",
   };
   return (
     <div className="bg-card flex h-[20px] items-center justify-center px-[6px] py-px relative rounded-[var(--radius-button)] shrink-0">
@@ -438,10 +440,7 @@ function WikiReviewBlockView({ wikiReview, onSave, onDismiss, onBlockClick, onBl
           <div className="bg-background h-[40px] shrink-0 w-full relative">
             <div aria-hidden="true" className="absolute border-muted border-b border-solid inset-0 pointer-events-none" />
             <div className="flex items-center px-[16px] py-[8px] size-full gap-[8px]">
-              <div className="bg-fyi/10 flex h-[20px] items-center justify-center px-[6px] py-px rounded-[var(--radius-button)] shrink-0 gap-[4px]">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1v2M8 13v2M3.05 3.05l1.414 1.414M11.536 11.536l1.414 1.414M1 8h2M13 8h2M3.05 12.95l1.414-1.414M11.536 4.464l1.414-1.414" stroke="var(--fyi)" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                <p className="text-fyi tracking-[0.3px] uppercase whitespace-nowrap" style={{ fontFamily: "var(--font-sans)", fontSize: "9px", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>WIKI</p>
-              </div>
+              <BlockTypeBadge type="wiki" />
               <p className="text-secondary-foreground flex-1" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>{typeLabels[wikiReview.nodeType]} · {wikiReview.nodeLabel}</p>
             </div>
           </div>
@@ -598,7 +597,7 @@ function ChartBlockView({ block, onBlockClick, onBlockHover, hoveredBlock, onSav
           <div className="bg-background h-[40px] shrink-0 w-full relative">
             <div aria-hidden="true" className="absolute border-muted border-b border-solid inset-0 pointer-events-none" />
             <div className="flex items-center px-[16px] py-[8px] size-full justify-between overflow-hidden">
-              <div className="flex gap-[8px] items-center min-w-0 flex-1"><BlockTypeBadge type="chart" /><p className="text-secondary-foreground whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>{block.title}</p></div>
+              <div className="flex gap-[8px] items-center min-w-0 flex-1"><BlockTypeBadge type={isLineage ? "lineage" : "chart"} /><p className="text-secondary-foreground whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-sm)", fontWeight: "var(--font-weight-semibold)", lineHeight: "1.5" }}>{block.title}</p></div>
               <TimeBadge time={isLineage ? "0.3s" : "1.2s"} />
             </div>
           </div>

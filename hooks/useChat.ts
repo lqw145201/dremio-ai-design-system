@@ -12,7 +12,7 @@ import {
 
 // STATE — Type definitions
 
-export type BlockType = "sql" | "table" | "chart" | "explanation" | "dataset" | "view";
+export type BlockType = "sql" | "table" | "chart" | "explanation" | "dataset" | "view" | "lineage" | "wiki";
 
 export interface OutputBlock {
   id: string;
