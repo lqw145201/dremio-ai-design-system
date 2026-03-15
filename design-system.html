@@ -493,6 +493,8 @@
       <div><a href="#s8"><span class="toc-num">08</span>Chat Panel</a></div>
       <div><a href="#s2"><span class="toc-num">02</span>Design Tokens — Colors</a></div>
       <div><a href="#s9"><span class="toc-num">09</span>Chat Input</a></div>
+      <div><a href="#s9b"><span class="toc-num">09b</span>Chat Attachment Pill</a></div>
+      <div><a href="#s9c"><span class="toc-num">09c</span>Toast Notification</a></div>
       <div><a href="#s3"><span class="toc-num">03</span>Design Tokens — Typography</a></div>
       <div><a href="#s10"><span class="toc-num">10</span>Workspace Panel</a></div>
       <div><a href="#s4"><span class="toc-num">04</span>Design Tokens — Spacing &amp; Shadows</a></div>
@@ -521,7 +523,7 @@
       <tbody>
         <tr><td><code>AIAgentPage.tsx</code></td><td>Root page — mounts the full 4-panel layout (design-system root)</td></tr>
         <tr><td><code>src/app/pages/AIAgentPage.tsx</code></td><td>Root page — in the prototype project</td></tr>
-        <tr><td><code>components/</code></td><td>LeftNav, TopNav, ChatListPanel, ChatPanel, WorkspacePanel, CatalogPanel, ChatInput, CollapsedPanelStrip, ToolCallsBlock, UserMessageBubble, UserAvatar</td></tr>
+        <tr><td><code>components/</code></td><td>LeftNav, TopNav, ChatListPanel, ChatPanel, WorkspacePanel, CatalogPanel, ChatInput, ChatAttachmentPill, Toast, CollapsedPanelStrip, ToolCallsBlock, UserMessageBubble, UserAvatar</td></tr>
         <tr><td><code>components/ui/</code></td><td>Shared primitives: Button, Table, Badge</td></tr>
         <tr><td><code>components/icons/</code></td><td>101 Dremio SVG icon components — check here before installing any icon package</td></tr>
         <tr><td><code>hooks/</code></td><td>usePanelLayout, useWorkspace, useChat</td></tr>
@@ -1042,6 +1044,120 @@ text-chart-5  text-[9px]  font-semibold</pre>
         <tr><td>Input focus ring</td><td>border-color <code>--primary</code>, no box-shadow</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ═══ §09b CHAT ATTACHMENT PILL ═══════════════════════════════════════ -->
+  <div class="section" id="s9b">
+    <h2><span class="sec-num">09b</span>Chat Attachment Pill</h2>
+    <p>Source: <code class="inline">components/ChatAttachmentPill.tsx</code>. Appears inside the chat input when a user attaches a data entity (table, dataset, folder, schema) to their message. Displays the full entity path with a remove button. No leading icon.</p>
+
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Height</td><td>24px</td></tr>
+        <tr><td>Padding</td><td><code>0 4px</code></td></tr>
+        <tr><td>Border radius</td><td>4px (<code>--radius-button</code>)</td></tr>
+        <tr><td>Background</td><td><code>--muted</code> (#EEEFF1)</td></tr>
+        <tr><td>Text</td><td>14px regular, <code>--foreground</code>, truncates with ellipsis</td></tr>
+        <tr><td>Close button</td><td>8×8 × SVG, <code>--secondary-foreground</code> stroke, <code>opacity-60</code> on hover</td></tr>
+        <tr><td>No icon</td><td>Path text only — no leading dataset/table/folder icon</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Props</h3>
+    <table class="dt">
+      <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>path</code></td><td><code>string</code></td><td>—</td><td>Full entity path shown as the pill label</td></tr>
+        <tr><td><code>onRemove</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called when × is clicked</td></tr>
+        <tr><td><code>removeLabel</code></td><td><code>string</code></td><td><code>"Remove &lt;path&gt;"</code></td><td>Accessible label for the remove button</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Usage</h3>
+    <pre>&lt;ChatAttachmentPill
+  path="prod.finance.orders"
+  onRemove={() => removeChip(id)}
+/&gt;
+
+&lt;ChatAttachmentPill
+  path="Data Lake / Finance / Q4 Sales"
+  onRemove={() => removeChip(id)}
+/&gt;</pre>
+
+    <div class="note">Pills are rendered inside <code>ChatInput</code> above the textarea row. When chips are present the textarea placeholder changes to acknowledge the attached context. See <code>ChatInput.tsx</code> → <code>contextChips</code> prop.</div>
+  </div>
+
+  <!-- ═══ §09c TOAST ════════════════════════════════════════════════════════ -->
+  <div class="section" id="s9c">
+    <h2><span class="sec-num">09c</span>Toast Notification</h2>
+    <p>Source: <code class="inline">components/Toast.tsx</code>. A lightweight notification that slides in from the <strong>bottom-right</strong> corner and auto-dismisses after 3 seconds. Used for copy confirmations, save feedback, errors, and other transient status messages.</p>
+
+    <div class="note"><strong>Why bottom-right?</strong> The AI agent layout has a chat input at the bottom of the left panel and workspace content filling the center/right. Bottom-right is the neutral corner furthest from both active regions — it matches the convention of developer tools (VS Code, Cursor, Linear, Vercel) and avoids cutting across content being read.</div>
+
+    <table class="dt">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Position</td><td>Fixed, bottom-right: <code>bottom: 24px; right: 24px</code></td></tr>
+        <tr><td>Height</td><td>40px</td></tr>
+        <tr><td>Padding</td><td><code>0 12px</code></td></tr>
+        <tr><td>Border radius</td><td>8px</td></tr>
+        <tr><td>Background</td><td><code>--card</code> (white)</td></tr>
+        <tr><td>Border</td><td>1px solid <code>--muted</code></td></tr>
+        <tr><td>Shadow</td><td><code>--shadow-sm</code>: 0px 2px 4px rgba(16,18,20,0.10)</td></tr>
+        <tr><td>Width</td><td>min 200px, max 360px</td></tr>
+        <tr><td>Auto-dismiss</td><td>3000ms (configurable via <code>duration</code> prop; pass <code>0</code> to disable)</td></tr>
+        <tr><td>Exit animation</td><td>200ms fade + 8px downward translate</td></tr>
+        <tr><td>z-index</td><td>9999 — above all panels</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Variants</h3>
+    <table class="dt">
+      <thead><tr><th>Variant</th><th>Icon</th><th>Use case</th></tr></thead>
+      <tbody>
+        <tr><td><code>default</code></td><td>None</td><td>Neutral status: "Query saved", "Changes applied"</td></tr>
+        <tr><td><code>success</code></td><td>Green circle checkmark (<code>--chart-5</code>)</td><td>Confirmations: "Copied to clipboard", "Saved"</td></tr>
+        <tr><td><code>error</code></td><td>Red circle ! (<code>--destructive</code>)</td><td>Failures: "Failed to save", "Connection error"</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Props</h3>
+    <table class="dt">
+      <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>message</code></td><td><code>string</code></td><td>—</td><td>Text shown in the toast</td></tr>
+        <tr><td><code>variant</code></td><td><code>"default" | "success" | "error"</code></td><td><code>"default"</code></td><td>Visual style</td></tr>
+        <tr><td><code>duration</code></td><td><code>number</code></td><td><code>3000</code></td><td>Auto-dismiss delay in ms. Pass <code>0</code> to disable auto-dismiss.</td></tr>
+        <tr><td><code>onDismiss</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called after the toast finishes its exit animation</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Usage — imperative hook (recommended)</h3>
+    <pre>import { useToast } from './components';
+
+function MyComponent() {
+  const { showToast, ToastOutlet } = useToast();
+
+  return (
+    &lt;&gt;
+      &lt;button onClick={() =&gt; {
+        navigator.clipboard.writeText(sql);
+        showToast("Copied to clipboard", "success");
+      }}&gt;
+        Copy SQL
+      &lt;/button&gt;
+
+      &lt;ToastOutlet /&gt;   {/* renders the active toast, if any */}
+    &lt;/&gt;
+  );
+}</pre>
+
+    <h3>Usage — direct render</h3>
+    <pre>&lt;Toast message="Copied to clipboard" variant="success" /&gt;
+&lt;Toast message="Failed to run query" variant="error" /&gt;
+&lt;Toast message="View saved" /&gt;
+&lt;Toast message="Processing…" duration={0} /&gt;  {/* stays until dismissed */}</pre>
   </div>
 
   <!-- ═══ §10 WORKSPACE PANEL ══════════════════════════════════════════════ -->

@@ -23,6 +23,10 @@ export { ToolCallsBlock } from './ToolCallsBlock';
 export { ChatInput } from './ChatInput';
 export { UserMessageBubble, UserMessageText, AITypingIndicator } from './UserMessageBubble';
 export { UserAvatar } from './UserAvatar';
+export { Toast, useToast } from './Toast';
+export type { ToastProps, ToastVariant } from './Toast';
+export { ChatAttachmentPill } from './ChatAttachmentPill';
+export type { ChatAttachmentPillProps } from './ChatAttachmentPill';
 
 // ── UI primitives ─────────────────────────────────────────────────────────
 export * from './ui';

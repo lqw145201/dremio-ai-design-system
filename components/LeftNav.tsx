@@ -91,7 +91,7 @@ function IconWrapper({ active, children }: { active: boolean; children: React.Re
 }
 
 // LAYOUT — Main nav container
-// Background: var(--background) = #F6F7F8 light gray (matches mona_test_aiagent reference).
+// Background: var(--background) = #F6F7F8 light gray.
 // ⚠️ Hex fallback is intentional — if theme.css is not imported, var(--background) resolves to
 //    nothing. Never remove the fallback.
 export function LeftNav({ activeItem = "ai-agent", userInitials = "TS", onNavigate }: LeftNavProps = {}) {

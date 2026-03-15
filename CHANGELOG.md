@@ -7,6 +7,19 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-14 · Design Systems · New components: Toast, ChatAttachmentPill + cleanup
+
+**What changed:**
+- Added `components/Toast.tsx` — new Toast notification component with `useToast()` hook. Positioned bottom-right (24px from edges). Three variants: `default`, `success` (green icon), `error` (red icon). Auto-dismisses after 3s with 200ms fade-out animation. `duration={0}` disables auto-dismiss. `useToast()` hook provides imperative `showToast(message, variant)` API and a `<ToastOutlet />` to render the active toast.
+- Added `components/ChatAttachmentPill.tsx` — standalone pill component for data entity attachments in the chat input. Displays the full entity path (no leading icon), truncates with ellipsis, has a × remove button. Formalises the inline chip pattern that existed inside `ChatInput.tsx`.
+- Removed all remaining `mona_test_aiagent` references from component source files (`LeftNav.tsx`, `ToolCallsBlock.tsx`). Components are unchanged visually — only internal comments were cleaned.
+- Updated `components/index.ts` to export both new components.
+- Updated `design-system.html`: added §09b (Chat Attachment Pill) and §09c (Toast Notification) sections with prop tables, variant tables, and usage examples. Added both to the nav sidebar and the component table.
+
+**Why:** Toast and ChatAttachmentPill are distinct reusable components missing from the design system. Toast placement at bottom-right is the convention for developer/data tools (VS Code, Cursor, Linear, Vercel) and avoids overlapping the chat input or workspace content. All external repository references removed so this design system is fully self-contained.
+
+---
+
 ## 2026-03-13 · Design Systems · IconDremioLogo — Replace placeholder circles with actual brand mark SVG paths
 
 **What changed:** `components/icons/IconDremioLogo.tsx` — replaced 4 concentric `<circle>` elements (placeholder approximation) with the 14 actual Dremio brand mark SVG paths sourced from the Figma export in `mona_test_aiagent`. Colors: `#2E3336` (dark), `#31D3DB` (teal), `#FFFFFE` (white), `#2FA69F` (green-teal).
