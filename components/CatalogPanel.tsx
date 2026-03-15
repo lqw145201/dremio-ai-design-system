@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { useToast } from "./Toast";
 // Inline path data for non-standard viewBox icons used in this panel
 // Source: svg-javaskxvh1.ts
 
@@ -295,22 +296,6 @@ function NodeIcon({ type }: { type: "source" | "folder" | "table" | "view" }) {
   if (type === "view") return <ViewIcon />;
   if (type === "source") return <SourceIcon />;
   return <FolderIcon />;
-}
-
-/* ── Toast notification ─────────────────────────────────── */
-
-function Toast({ message, onClose }: { message: string; onClose: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 2200);
-    return () => clearTimeout(t);
-  }, [onClose]);
-
-  return createPortal(
-    <div className="fixed bottom-[16px] left-1/2 -translate-x-1/2 z-[10000] bg-foreground rounded-[var(--radius-card)] px-[16px] py-[8px] shadow-sm">
-      <p className="font-['Inter',sans-serif] font-normal leading-[150%] text-card text-[12px] whitespace-nowrap">{message}</p>
-    </div>,
-    document.body,
-  );
 }
 
 /* ── Inline sample data preview ─────────────────────────── */
@@ -737,8 +722,8 @@ export function CatalogPanel({ onCollapse, saveViewMode, onSaveView, onCancelSav
   // Shared menu state — only one "..." menu open at a time
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  // Toast state
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  // Toast — uses shared component from components/Toast.tsx
+  const { showToast, ToastOutlet } = useToast();
 
   // Inline preview state
   const [samplePreviewId, setSamplePreviewId] = useState<string | null>(null);
@@ -768,9 +753,6 @@ export function CatalogPanel({ onCollapse, saveViewMode, onSaveView, onCancelSav
     }, 1600);
   };
 
-  const showToast = useCallback((msg: string) => {
-    setToastMsg(msg);
-  }, []);
 
   const handleAction = useCallback((action: string, nodeId: string, nodeLabel: string, nodeType: "source" | "folder" | "table" | "view") => {
     const fullPath = buildFullPath(nodeId);
@@ -1050,7 +1032,7 @@ export function CatalogPanel({ onCollapse, saveViewMode, onSaveView, onCancelSav
 
 
       {/* Toast */}
-      {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
+      <ToastOutlet />
     </div>
   );
 }

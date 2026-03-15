@@ -7,6 +7,14 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-14 · Claude · CatalogPanel — remove inline Toast duplicate
+
+**What changed:** Deleted the inline `function Toast(...)` from `CatalogPanel.tsx` and replaced with `useToast()` from the shared `components/Toast.tsx`. Manual `[toastMsg, setToastMsg]` state and `showToast` callback replaced by the hook. Render site changed from `{toastMsg && <Toast .../>}` to `<ToastOutlet />`.
+
+**Why:** Two Toast implementations existed — the inline one in CatalogPanel and the standalone `components/Toast.tsx`. Now there is one source of truth.
+
+---
+
 ## 2026-03-14 · Claude · Toast — rewritten to match actual app
 
 **What changed:** `components/Toast.tsx` completely rewritten to match the real implementation from the Dremio AI Agent prototype (`CatalogPanel.tsx`).
