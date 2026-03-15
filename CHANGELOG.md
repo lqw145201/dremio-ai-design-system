@@ -41,6 +41,33 @@ Previous version was invented from scratch and did not reflect what's in the app
 
 ---
 
+## 2026-03-14 · Claude · design-system.html — Remove all Figma and external repo references
+
+**What changed:** Removed every reference to the Figma file and external repositories from `design-system.html`:
+- "Figma-generated svgPaths" → "generated svgPaths"
+- "extracted from the original Figma export" → "specific to each icon"
+- "Dimensions (Figma spec)" → "Dimensions"
+- "This matches the reference design in mona_test_aiagent" — removed from LeftNav warning
+- Figma node `12337:132404` removed from TopNav source line
+- Three critical rules removed: "always read Figma before building", "read page node first", "never guess icon names from Figma"
+- "Never import svgPaths from Figma-generated files" → "generated files"
+
+**Why:** The `dremio-ai-design-system` is a standalone design system. It must not reference any external Figma file or other repository — all specs are self-contained in the components and this HTML file.
+
+---
+
+## 2026-03-14 · Claude · README — Remove wrong prototype references, add PM/engineer guidance
+
+**What changed:** Rewrote `README.md` to:
+- Remove all incorrect references to `dremio-design-system` as "the prototype" — `dremio-design-system` is a separate standalone design system, not a prototype
+- Remove the Figma file URL (`https://www.figma.com/design/P2EhSAF4LQfhYQEIiyltan/`) — that Figma file belongs to `dremio-design-system`, not this repo
+- Added clear step-by-step guidance for PMs (open HTML file first, understand tokens, understand components) and engineers (clone repo, copy files, import theme, use barrel exports)
+- Added the `design-system.html` link prominently as the first step for both audiences
+
+**Why:** The README previously contained contradictions (naming `dremio-prototype` as the prototype in one place, then calling `dremio-design-system` the prototype in two other places) and referenced a Figma file that belongs to a different design system entirely.
+
+---
+
 ## 2026-03-14 · Design Systems · New components: Toast, ChatAttachmentPill + cleanup
 
 **What changed:**
