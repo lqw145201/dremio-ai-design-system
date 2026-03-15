@@ -1101,45 +1101,36 @@ text-chart-5  text-[9px]  font-semibold</pre>
   <!-- ═══ §09c TOAST ════════════════════════════════════════════════════════ -->
   <div class="section" id="s9c">
     <h2><span class="sec-num">09c</span>Toast Notification</h2>
-    <p>Source: <code class="inline">components/Toast.tsx</code>. A lightweight notification that slides in from the <strong>bottom-right</strong> corner and auto-dismisses after 3 seconds. Used for copy confirmations, save feedback, errors, and other transient status messages.</p>
+    <p>Source: <code class="inline">components/Toast.tsx</code>. A dark pill anchored <strong>bottom-center</strong> of the viewport. Auto-dismisses after 2200ms. No icon, no close button, no variants — plain message text only.</p>
 
-    <div class="note"><strong>Why bottom-right?</strong> The AI agent layout has a chat input at the bottom of the left panel and workspace content filling the center/right. Bottom-right is the neutral corner furthest from both active regions — it matches the convention of developer tools (VS Code, Cursor, Linear, Vercel) and avoids cutting across content being read.</div>
+    <div class="demo-box" style="background:#f0f0f0; padding:40px 16px; text-align:center; border-radius:8px; margin-bottom:16px; position:relative; min-height:80px; display:flex; align-items:center; justify-content:center;">
+      <div style="background:#202124; border-radius:8px; padding:8px 16px; display:inline-block;">
+        <span style="font-family:'Inter',sans-serif; font-size:12px; color:#ffffff; white-space:nowrap;">Copied: Dremio_samples</span>
+      </div>
+    </div>
 
     <table class="dt">
       <thead><tr><th>Property</th><th>Value</th></tr></thead>
       <tbody>
-        <tr><td>Position</td><td>Fixed, bottom-right: <code>bottom: 24px; right: 24px</code></td></tr>
-        <tr><td>Height</td><td>40px</td></tr>
-        <tr><td>Padding</td><td><code>0 12px</code></td></tr>
-        <tr><td>Border radius</td><td>8px</td></tr>
-        <tr><td>Background</td><td><code>--card</code> (white)</td></tr>
-        <tr><td>Border</td><td>1px solid <code>--muted</code></td></tr>
-        <tr><td>Shadow</td><td><code>--shadow-sm</code>: 0px 2px 4px rgba(16,18,20,0.10)</td></tr>
-        <tr><td>Width</td><td>min 200px, max 360px</td></tr>
-        <tr><td>Auto-dismiss</td><td>3000ms (configurable via <code>duration</code> prop; pass <code>0</code> to disable)</td></tr>
-        <tr><td>Exit animation</td><td>200ms fade + 8px downward translate</td></tr>
-        <tr><td>z-index</td><td>9999 — above all panels</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Variants</h3>
-    <table class="dt">
-      <thead><tr><th>Variant</th><th>Icon</th><th>Use case</th></tr></thead>
-      <tbody>
-        <tr><td><code>default</code></td><td>None</td><td>Neutral status: "Query saved", "Changes applied"</td></tr>
-        <tr><td><code>success</code></td><td>Green circle checkmark (<code>--chart-5</code>)</td><td>Confirmations: "Copied to clipboard", "Saved"</td></tr>
-        <tr><td><code>error</code></td><td>Red circle ! (<code>--destructive</code>)</td><td>Failures: "Failed to save", "Connection error"</td></tr>
+        <tr><td>Position</td><td>Fixed, bottom-center: <code>bottom: 16px; left: 50%; transform: translateX(-50%)</code></td></tr>
+        <tr><td>Background</td><td><code>bg-foreground</code> — #202124 dark</td></tr>
+        <tr><td>Text color</td><td><code>text-card</code> — #FFFFFF white</td></tr>
+        <tr><td>Text size</td><td>12px, font-normal, Inter, whitespace-nowrap</td></tr>
+        <tr><td>Padding</td><td><code>px-[16px] py-[8px]</code></td></tr>
+        <tr><td>Border radius</td><td><code>var(--radius-card)</code> = 8px</td></tr>
+        <tr><td>Shadow</td><td><code>shadow-sm</code></td></tr>
+        <tr><td>Auto-dismiss</td><td>2200ms — not configurable</td></tr>
+        <tr><td>Rendered via</td><td><code>createPortal(…, document.body)</code> — always above all panels</td></tr>
+        <tr><td>No icon</td><td>Text only — no success/error/close affordances</td></tr>
       </tbody>
     </table>
 
     <h3>Props</h3>
     <table class="dt">
-      <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td><code>message</code></td><td><code>string</code></td><td>—</td><td>Text shown in the toast</td></tr>
-        <tr><td><code>variant</code></td><td><code>"default" | "success" | "error"</code></td><td><code>"default"</code></td><td>Visual style</td></tr>
-        <tr><td><code>duration</code></td><td><code>number</code></td><td><code>3000</code></td><td>Auto-dismiss delay in ms. Pass <code>0</code> to disable auto-dismiss.</td></tr>
-        <tr><td><code>onDismiss</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called after the toast finishes its exit animation</td></tr>
+        <tr><td><code>message</code></td><td><code>string</code></td><td>Text shown in the toast</td></tr>
+        <tr><td><code>onClose</code></td><td><code>() =&gt; void</code></td><td>Called after 2200ms auto-dismiss</td></tr>
       </tbody>
     </table>
 
@@ -1152,10 +1143,10 @@ function MyComponent() {
   return (
     &lt;&gt;
       &lt;button onClick={() =&gt; {
-        navigator.clipboard.writeText(sql);
-        showToast("Copied to clipboard", "success");
+        navigator.clipboard.writeText(path);
+        showToast(`Copied: ${path}`);
       }}&gt;
-        Copy SQL
+        Copy path
       &lt;/button&gt;
 
       &lt;ToastOutlet /&gt;   {/* renders the active toast, if any */}
@@ -1163,11 +1154,11 @@ function MyComponent() {
   );
 }</pre>
 
-    <h3>Usage — direct render</h3>
-    <pre>&lt;Toast message="Copied to clipboard" variant="success" /&gt;
-&lt;Toast message="Failed to run query" variant="error" /&gt;
-&lt;Toast message="View saved" /&gt;
-&lt;Toast message="Processing…" duration={0} /&gt;  {/* stays until dismissed */}</pre>
+    <h3>Trigger examples from the app</h3>
+    <pre>showToast(`Copied: ${fullPath}`);
+showToast(`Added "${nodeLabel}" to chat input`);
+showToast(`Generating wiki for "${nodeLabel}"…`);
+showToast(`Wiki generated for "${nodeLabel}"`);</pre>
   </div>
 
   <!-- ═══ §10 WORKSPACE PANEL ══════════════════════════════════════════════ -->

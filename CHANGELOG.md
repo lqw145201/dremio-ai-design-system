@@ -7,6 +7,20 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-14 · Claude · Toast — rewritten to match actual app
+
+**What changed:** `components/Toast.tsx` completely rewritten to match the real implementation from the Dremio AI Agent prototype (`CatalogPanel.tsx`).
+
+Previous version was invented from scratch and did not reflect what's in the app:
+- Was: white card, bottom-right, with icon variants (success/error), close button, 3000ms dismiss
+- Now: dark pill (`bg-foreground` #202124), white text (`text-card`), bottom-center, no icon, no close button, 2200ms dismiss, rendered via `createPortal`
+
+`design-system.html` §09c updated to match — new live preview, corrected spec table, corrected props table and usage examples.
+
+**Why:** The design system must document exactly what's in the app, not an approximation.
+
+---
+
 ## 2026-03-14 · Design Systems · Fix primary button color — use --accent (#008489) not --primary (#43B8C9)
 
 **What changed:**
