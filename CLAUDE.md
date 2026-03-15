@@ -124,9 +124,9 @@ If you think an element "belongs" somewhere but haven't verified it in Figma —
 | `--background` | `#F6F7F8` | Page body, tool call block bg |
 | `--card` | `#FFFFFF` | Panels, cards, badge bg |
 | `--border` | `#D2D6DA` | Input/card borders, badge borders |
-| `--primary` | `#43B8C9` | Primary buttons, active states, running spinner |
-| `--sidebar-primary` | `#2E92A1` | Primary button hover, selected nav item bg |
-| `--accent` | `#008489` | Ghost button text, links — NOT button backgrounds |
+| `--primary` | `#43B8C9` | Active states, running spinner, highlight tints — NOT button backgrounds |
+| `--accent` | `#008489` | **Primary button background**, ghost button text, links |
+| `--accent-hover` | `#007074` | Primary button hover background |
 | `--destructive` | `#CA3F32` | Delete actions, error, ApprovalBadge text |
 | `--destructive-hover` | `#AD3021` | Destructive button hover |
 | `--background-hover` | `#F1FAFB` | Ghost button hover bg, nav item hover |
@@ -203,7 +203,7 @@ Use `<Button>` from `components/ui/button.tsx` — never hand-build `<button>` f
 
 | Variant | cva key | Default bg | Hover bg | Text |
 |---|---|---|---|---|
-| Primary | `default` | `--primary` (#43B8C9) | `--sidebar-primary` (#2E92A1) | white |
+| Primary | `default` | `--accent` (#008489) | `--accent-hover` (#007074) | white |
 | Secondary | `secondary` | `--card` (#FFFFFF) | `--background` (#F6F7F8) | `--secondary-foreground` |
 | Ghost | `ghost` | transparent | `--background-hover` (#F1FAFB) | `--accent` (#008489) |
 | Destructive | `destructive` | `--destructive` (#CA3F32) | `--destructive-hover` (#AD3021) | white |
@@ -214,7 +214,7 @@ Use `<Button>` from `components/ui/button.tsx` — never hand-build `<button>` f
 
 ⚠️ cva hover colors **cannot be overridden via `className`** — Tailwind resolves by stylesheet order. Edit the variant in `button.tsx` directly.
 
-⚠️ **Known prototype inconsistency:** Some ad-hoc buttons (Execute, Run in SQL runner) use `bg-accent` (#008489) directly instead of `<Button variant="default">`. This is incorrect — refactor to use the Button component.
+⚠️ Ad-hoc buttons using `bg-accent` (#008489) directly (Execute, Run in SQL runner) are now correct by design — `--accent` is the primary button color. Refactor them to use `<Button variant="default">` for consistency.
 
 ---
 
@@ -402,7 +402,7 @@ Renders when WorkspacePanel or CatalogPanel is collapsed. Provides vertical icon
 ## Critical Rules
 
 1. `--muted-foreground` for placeholders/disabled ONLY — labels, headers → `--secondary-foreground`
-2. `--accent` for ghost button text and links ONLY — never as a `bg-*` fill
+2. `--accent` (#008489) is the primary button background AND ghost button text color. `--primary` (#43B8C9) is for spinners, active state tints, and highlights — never for button backgrounds.
 3. No card chrome (border/radius/shadow/margin) on full-page panel layouts
 4. Max 1 Primary button per view
 5. Row/list actions: `opacity-0 group-hover:opacity-100` — never unconditionally visible

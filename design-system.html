@@ -19,6 +19,7 @@
     --primary: #43B8C9;
     --sidebar-primary: #2E92A1;
     --accent: #008489;
+    --accent-hover: #007074;
     --destructive: #CA3F32;
     --destructive-hover: #AD3021;
     --bg-hover: #F1FAFB;
@@ -626,7 +627,7 @@
         <div class="swatch-info">
           <span class="swatch-token">--primary</span>
           <span class="swatch-hex">#43B8C9</span>
-          <span class="swatch-desc">Primary buttons, active states</span>
+          <span class="swatch-desc">Active states, running spinner, highlight tints</span>
         </div>
       </div>
       <div class="swatch-card">
@@ -634,7 +635,7 @@
         <div class="swatch-info">
           <span class="swatch-token">--sidebar-primary</span>
           <span class="swatch-hex">#2E92A1</span>
-          <span class="swatch-desc">Primary button hover</span>
+          <span class="swatch-desc">Sidebar selected item bg, mid-range teal</span>
         </div>
       </div>
       <div class="swatch-card">
@@ -642,7 +643,15 @@
         <div class="swatch-info">
           <span class="swatch-token">--accent</span>
           <span class="swatch-hex">#008489</span>
-          <span class="swatch-desc">Links, ghost button text</span>
+          <span class="swatch-desc">Primary button bg, ghost button text, links</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#007074"></div>
+        <div class="swatch-info">
+          <span class="swatch-token">--accent-hover</span>
+          <span class="swatch-hex">#007074</span>
+          <span class="swatch-desc">Primary button hover bg</span>
         </div>
       </div>
       <div class="swatch-card">
@@ -689,10 +698,9 @@
 
     <div class="rule"><strong>Critical:</strong> <code class="inline">--muted-foreground</code> is for placeholders and disabled states ONLY. Table headers, stat labels, and section descriptions must use <code class="inline">--secondary-foreground</code> (#505862).</div>
 
-    <div class="warn" style="margin-top:12px;">
-      <strong>⚠ Prototype inconsistency — primary vs accent as button background.</strong><br>
-      The formal <code class="inline">&lt;Button variant="default"&gt;</code> component correctly uses <code class="inline">--primary</code> (#43B8C9) as its background. However, several action buttons in the prototype (<em>Execute</em>, <em>Run in SQL runner</em>, <em>Run in SQL</em> in WorkspacePanel) were built as ad-hoc <code class="inline">&lt;button&gt;</code> elements with <code class="inline">bg-accent</code> (#008489) — a darker teal — applied directly.<br><br>
-      <strong>Rule:</strong> <code class="inline">--accent</code> is for <em>ghost button text and links only</em> — never as a button background fill. Any hand-built action button using <code class="inline">bg-accent</code> should be refactored to use <code class="inline">&lt;Button variant="default"&gt;</code> (which renders with <code class="inline">--primary</code>).
+    <div class="note" style="margin-top:12px;">
+      <strong>Token clarification — primary vs accent.</strong><br>
+      <code class="inline">--accent</code> (#008489) is the primary button background color. <code class="inline">--primary</code> (#43B8C9) is the lighter teal used for active state tints, running spinners, and highlights — <strong>not</strong> for button backgrounds. Ad-hoc action buttons (Execute, Run in SQL runner) using <code class="inline">bg-accent</code> are correct — they should be refactored to use <code class="inline">&lt;Button variant="default"&gt;</code> for consistency, not re-colored.
     </div>
 
     <h3>Tailwind Usage</h3>
@@ -708,7 +716,8 @@
         <tr><td><code>bg-background</code></td><td><code>--background</code></td><td>Page body</td></tr>
         <tr><td><code>bg-card</code></td><td><code>--card</code></td><td>Panel backgrounds</td></tr>
         <tr><td><code>bg-muted</code></td><td><code>--muted</code></td><td>Selected chat rows, dividers</td></tr>
-        <tr><td><code>bg-primary</code></td><td><code>--primary</code></td><td>Primary button bg</td></tr>
+        <tr><td><code>bg-accent</code></td><td><code>--accent</code></td><td>Primary button bg</td></tr>
+        <tr><td><code>bg-primary</code></td><td><code>--primary</code></td><td>Running spinner, active tint (not buttons)</td></tr>
         <tr><td><code>border-border</code></td><td><code>--border</code></td><td>Card and input borders</td></tr>
         <tr><td><code>border-muted</code></td><td><code>--muted</code></td><td>Section dividers, sidebar border</td></tr>
       </tbody>
@@ -881,7 +890,7 @@ text-chart-5  text-[9px]  font-semibold</pre>
     <table class="dt">
       <thead><tr><th>Variant</th><th>cva key</th><th>Default bg</th><th>Hover bg</th><th>Text</th><th>Border</th></tr></thead>
       <tbody>
-        <tr><td>Primary</td><td><code>default</code></td><td><code>--primary</code> #43B8C9</td><td><code>--sidebar-primary</code> #2E92A1</td><td>white</td><td>none</td></tr>
+        <tr><td>Primary</td><td><code>default</code></td><td><code>--accent</code> #008489</td><td><code>--accent-hover</code> #007074</td><td>white</td><td>none</td></tr>
         <tr><td>Secondary</td><td><code>secondary</code></td><td><code>--card</code> #FFFFFF</td><td><code>--background</code> #F6F7F8</td><td><code>--secondary-fg</code></td><td><code>border-border</code></td></tr>
         <tr><td>Ghost</td><td><code>ghost</code></td><td>transparent</td><td><code>--background-hover</code> #F1FAFB</td><td><code>--accent</code> #008489</td><td>none</td></tr>
         <tr><td>Destructive</td><td><code>destructive</code></td><td><code>--destructive</code> #CA3F32</td><td><code>--destructive-hover</code> #AD3021</td><td>white</td><td>none</td></tr>

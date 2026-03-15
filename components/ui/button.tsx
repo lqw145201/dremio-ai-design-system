@@ -9,8 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Primary: teal bg → darker teal on hover (#2E92A1 = sidebar-primary)
-        default: "bg-primary text-primary-foreground hover:bg-sidebar-primary",
+        // Primary: accent bg (#008489) → darker accent on hover (#007074 = accent-hover)
+        default: "bg-accent text-accent-foreground hover:bg-accent-hover",
         // Destructive: red bg → darker red on hover (#AD3021 = destructive-hover)
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive-hover focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",

@@ -41,10 +41,12 @@
   --muted: rgba(238, 239, 241, 1);
   /* The default color for text or elements that appear on top of muted colored elements. */
   --muted-foreground: rgba(176, 183, 191, 1);
-  /* The accent color used for highlights, links, and other interactive elements. */
+  /* The accent color — used as the primary button background, ghost button text, and links. */
   --accent: rgba(0, 132, 137, 1);
   /* The default color for text or elements that appear on top of accent colored elements. */
   --accent-foreground: rgba(255, 255, 255, 1);
+  /* The hover background color for primary (accent) buttons. ~15% darker than --accent. */
+  --accent-hover: rgba(0, 112, 116, 1);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
   --destructive: rgba(202, 63, 50, 1);
   /* The default color for text or elements that appear on top of destructive colored elements. */
@@ -118,6 +120,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-hover: var(--accent-hover);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-hover: var(--destructive-hover);

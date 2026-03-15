@@ -7,6 +7,18 @@ Format: **Date · Author · Component · Description**
 
 ---
 
+## 2026-03-14 · Design Systems · Fix primary button color — use --accent (#008489) not --primary (#43B8C9)
+
+**What changed:**
+- `styles/theme.css`: Added `--accent-hover: rgba(0, 112, 116, 1)` (#007074) — primary button hover, ~15% darker than `--accent`. Added `--color-accent-hover` Tailwind mapping.
+- `components/ui/button.tsx`: Default variant changed from `bg-primary hover:bg-sidebar-primary` to `bg-accent hover:bg-accent-hover`.
+- `CLAUDE.md`: Corrected token table, button table, removed incorrect "Known prototype inconsistency" note, corrected Critical Rule #2.
+- `design-system.html`: Updated swatches, button variants table, and replaced wrong warning with a clarification note.
+
+**Why:** The primary button in the design uses `--accent` (#008489, darker teal) as its background — not `--primary` (#43B8C9, lighter cyan). `--primary` is correctly used for spinners, active state tints, and running indicators. `--sidebar-primary` (#2E92A1) is lighter than `--accent` so it was wrong as a hover color — replaced with new `--accent-hover` (#007074).
+
+---
+
 ## 2026-03-14 · Design Systems · New components: Toast, ChatAttachmentPill + cleanup
 
 **What changed:**
